@@ -2,8 +2,9 @@
 title: Easy Dither
 summary: Ordered dithering for any clip in one Fusion macro, with six patterns, posterized color and twelve duotone presets.
 type: fusion-macro
-version: 1.0.0
+version: 1.1.0
 released: 2026-10-31
+updated: 2026-10-31
 compatibility:
   resolve: "21"
   edition: free
@@ -22,6 +23,9 @@ cover: ./images/easy-dither.jpg
 coverAlt: The words EASY DITHER in white dot-pattern letters over a dithered night scene of a gothic castle, with a lantern-lit path in the foreground.
 tags: [dither, retro, pixel, duotone]
 changelog:
+  - version: 1.1.0
+    date: 2026-10-31
+    notes: The Made by Cadenzy and The Editing Lair buttons at the top of the Inspector now open this site.
   - version: 1.0.0
     date: 2026-10-31
     notes: First public release.

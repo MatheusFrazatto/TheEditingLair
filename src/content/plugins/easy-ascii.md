@@ -2,8 +2,9 @@
 title: Easy ASCII
 summary: Turns any clip into animated ASCII art in one Fusion macro, with 13 character sets, 15 color palettes and full control over grid, tone and type.
 type: fusion-macro
-version: 2.0.0
+version: 2.1.0
 released: 2026-10-31
+updated: 2026-10-31
 compatibility:
   resolve: "21"
   edition: free
@@ -22,6 +23,9 @@ cover: ./images/easy-ascii.jpg
 coverAlt: The words EASY ASCII built from yellow @ characters over a world map drawn in orange, pink and purple ASCII symbols on a dark navy background.
 tags: [ascii, text, retro, stylize]
 changelog:
+  - version: 2.1.0
+    date: 2026-10-31
+    notes: The Made by Cadenzy and The Editing Lair buttons at the top of the Inspector now open this site.
   - version: 2.0.0
     date: 2026-10-31
     notes: First public release.

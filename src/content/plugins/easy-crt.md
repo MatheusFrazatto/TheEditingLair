@@ -2,7 +2,7 @@
 title: Easy CRT
 summary: A complete CRT screen look in one Fusion macro, with tube curvature, RGB phosphor mask, glow and bloom, halation, grain, color fringe and flicker.
 type: fusion-macro
-version: 2.1.0
+version: 2.2.0
 released: 2026-10-31
 updated: 2026-10-31
 compatibility:
@@ -12,7 +12,7 @@ access:
   kind: free
   download: downloads/easy-crt/Easy%20CRT.setting
   fileName: Easy CRT.setting
-  fileSize: 34 KB
+  fileSize: 35 KB
 controls:
   - { name: Curvature, default: "-0.4" }
   - { name: Mask Size, default: "1" }
@@ -24,6 +24,9 @@ coverBrightness: 2.1
 coverAlt: The words EASY CRT in red on a black CRT screen, crossed by wavy vertical scan lines.
 tags: [crt, retro, screen, glow]
 changelog:
+  - version: 2.2.0
+    date: 2026-10-31
+    notes: The Made by Cadenzy and The Editing Lair buttons at the top of the Inspector now open this site.
   - version: 2.1.0
     date: 2026-10-31
     notes: The top of the Inspector now shows the title, version and credits as centered buttons.

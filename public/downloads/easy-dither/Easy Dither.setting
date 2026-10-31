@@ -25,7 +25,7 @@
 					Page = "Controls",
 					Width = 1,
 				},
-				-- No click action yet; add bmd.openurl(...) once the site is public
+				-- The Cadenzy and site buttons open The Editing Lair (bmd.openurl).
 				Labels_MadeByButton = InstanceInput {
 					SourceOp = "Labels",
 					Source = "MadeByButton",
@@ -238,7 +238,7 @@
 						-- Title as a full-width button: Fusion always centres button
 						-- text, while a LabelControl stays left-aligned. No action.
 						Header = {
-							LINKS_Name = "Easy Dither  |  v1.0.0",
+							LINKS_Name = "Easy Dither  |  v1.1.0",
 							LINKID_DataType = "Number",
 							INPID_InputControl = "ButtonControl",
 							INP_Integer = true,
@@ -247,7 +247,7 @@
 							ICS_ControlPage = "Controls",
 						},
 						MadeByButton = {
-							LINKS_Name = "Made by Cadenzy",
+							LINKS_Name = "Made by Cadenzy", BTNCS_Execute = "bmd.openurl(\"https://matheusfrazatto.github.io/TheEditingLair/about/\")",
 							LINKID_DataType = "Number",
 							INPID_InputControl = "ButtonControl",
 							INP_Integer = true,
@@ -256,7 +256,7 @@
 							ICS_ControlPage = "Controls",
 						},
 						SiteButton = {
-							LINKS_Name = "The Editing Lair",
+							LINKS_Name = "The Editing Lair", BTNCS_Execute = "bmd.openurl(\"https://matheusfrazatto.github.io/TheEditingLair/\")",
 							LINKID_DataType = "Number",
 							INPID_InputControl = "ButtonControl",
 							INP_Integer = true,
