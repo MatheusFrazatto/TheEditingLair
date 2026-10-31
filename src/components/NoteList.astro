@@ -1,0 +1,98 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { withBase } from '../lib/url';
+import { isoDate, categoryLabel } from '../lib/format';
+
+interface Props {
+  posts: CollectionEntry<'posts'>[];
+  variant?: 'compact' | 'full';
+}
+
+const { posts, variant = 'compact' } = Astro.props;
+---
+<ol class:list={['notes', `notes--${variant}`]}>
+  {posts.map((post) => (
+    <li>
+      <p class="notes__meta">
+        <time class="n" datetime={post.data.published.toISOString()}>{isoDate(post.data.published)}</time>
+        {variant === 'full' && <span class="legend">{categoryLabel[post.data.category]}</span>}
+        {post.data.draft && <span class="draft-tag">Draft</span>}
+      </p>
+      <a class="notes__title ln ln--quiet" href={withBase(`notes/${post.id}/`)}>{post.data.title}</a>
+      {variant === 'full' && <p class="notes__desc">{post.data.description}</p>}
+    </li>
+  ))}
+</ol>
+
+<style>
+  .notes {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .notes li {
+    position: relative;
+    padding: 18px 0 20px;
+    border-top: 1px solid var(--z6);
+  }
+  .notes__meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 0 0 8px;
+    font-size: 0.875rem;
+    color: var(--z4);
+  }
+  .notes__meta .legend {
+    font-size: 0.8125rem;
+  }
+  .notes__title {
+    font: 600 1.375rem/1.28 var(--f-read);
+    color: var(--z0);
+    text-decoration: none;
+    text-wrap: balance;
+  }
+  .notes__title::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .notes li:hover .notes__title {
+    background-size: 100% 2px, 100% 1px;
+  }
+  .notes__desc {
+    max-width: 62ch;
+    margin: 8px 0 0;
+    color: var(--z3);
+  }
+  .notes--full li {
+    display: grid;
+    grid-template-columns: 11rem minmax(0, 1fr);
+    column-gap: 32px;
+    padding: 26px 0 28px;
+    border-top-color: var(--z7);
+  }
+  .notes--full .notes__meta {
+    grid-row: span 2;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 4px 0 0;
+  }
+  .notes--full .notes__title {
+    font-size: 1.625rem;
+  }
+  @media (max-width: 760px) {
+    .notes--full li {
+      grid-template-columns: 1fr;
+    }
+    .notes--full .notes__meta {
+      grid-row: auto;
+      flex-direction: row;
+      margin-bottom: 8px;
+    }
+    .notes--full .notes__title {
+      font-size: 1.375rem;
+    }
+  }
+</style>

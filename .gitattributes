@@ -1,0 +1,2 @@
+# Downloads ship byte-for-byte; never convert line endings
+public/downloads/** -text

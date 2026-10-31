@@ -1,0 +1,74 @@
+---
+import '../styles/global.css';
+import Wedge from '../components/Wedge.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import Intro from '../components/Intro.astro';
+import { withBase } from '../lib/url';
+
+interface Props {
+  title?: string;
+  description?: string;
+  wedge?: 'full' | 'compact';
+  current?: 'plugins' | 'notes' | 'about';
+}
+
+const {
+  title,
+  description = 'DaVinci Resolve Fusion macros and notes on editing, made by Cadenzy.',
+  wedge = 'compact',
+  current,
+} = Astro.props;
+
+const fullTitle = title ? `${title} | The Editing Lair` : 'The Editing Lair: Fusion tools and notes for DaVinci Resolve';
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href={withBase('favicon.svg')} type="image/svg+xml" />
+    <link rel="alternate" type="application/rss+xml" title="The Editing Lair: Notes" href={withBase('rss.xml')} />
+    <link rel="sitemap" href={withBase('sitemap-index.xml')} />
+    <meta name="theme-color" content="#1a1a1a" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <script is:inline>
+      // Decide before first paint: hold the home entrance for motion.ts, and
+      // play the intro once per session. Both release on their own if the
+      // motion script never runs.
+      (function () {
+        var d = document.documentElement;
+        try {
+          if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+          d.dataset.motion = 'on';
+          setTimeout(function () { d.dataset.motion = 'ready'; }, 3500);
+          if (!sessionStorage.getItem('tel-intro')) {
+            sessionStorage.setItem('tel-intro', '1');
+            d.dataset.intro = 'play';
+            setTimeout(function () { if (d.dataset.intro === 'play') d.dataset.intro = 'done'; }, 4500);
+          }
+        } catch (e) {
+          d.dataset.motion = 'ready';
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <Intro />
+    <a class="skip" href="#content">Skip to content</a>
+    <Wedge size={wedge} current={current} />
+    <main id="content">
+      <slot />
+    </main>
+    <SiteFooter />
+    <script>
+      import '../scripts/motion.ts';
+    </script>
+  </body>
+</html>

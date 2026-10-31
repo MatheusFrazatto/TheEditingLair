@@ -1,0 +1,197 @@
+---
+import { withBase } from '../lib/url';
+
+interface Props {
+  size?: 'full' | 'compact';
+  current?: 'plugins' | 'notes' | 'about';
+}
+
+const { size = 'compact', current } = Astro.props;
+
+const zones = ['0', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+// print density for each zone, as printed on a step wedge
+const density = ['2.05', '1.60', '1.30', '1.04', '0.80', '0.60', '0.42', '0.28', '0.17', '0.09', '0.05'];
+
+const nav = [
+  { id: 'plugins', label: 'Plugins', href: withBase('plugins/') },
+  { id: 'notes', label: 'Notes', href: withBase('notes/') },
+  { id: 'about', label: 'About', href: withBase('about/') },
+] as const;
+
+const TitleTag = size === 'full' ? 'h1' : 'p';
+---
+<header class:list={['wedge', `wedge--${size}`]}>
+  <div class="wedge__ramp" aria-hidden="true">
+    {zones.map((z, i) => (
+      <span style={`--tone: var(--z${i})`} class:list={{ dark: i < 5 }}>
+        <b>{z}</b><i class="n">{density[i]}</i>
+      </span>
+    ))}
+  </div>
+  <div class="wedge__inner">
+    <div class="wedge__title">
+      <TitleTag class="display wedge__name">
+        <a href={withBase('')}>The Editing Lair</a>
+      </TitleTag>
+      {size === 'full' && <p class="wedge__sub">Fusion tools and notes for DaVinci Resolve</p>}
+    </div>
+    <nav class="wedge__nav" aria-label="Main">
+      {nav.map((item) => (
+        <a href={item.href} aria-current={current === item.id ? 'page' : undefined}>{item.label}</a>
+      ))}
+    </nav>
+  </div>
+</header>
+
+<style>
+  .wedge {
+    position: relative;
+    height: 164px;
+    color: var(--z10);
+  }
+  .wedge--compact {
+    height: 112px;
+  }
+  .wedge__ramp {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(11, 1fr);
+  }
+  .wedge__ramp span {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    padding: 0 0 12px 14px;
+    background: var(--tone);
+    color: var(--z0);
+    font: 700 1rem/1 var(--f-legend);
+    letter-spacing: 0.14em;
+  }
+  .wedge__ramp span.dark {
+    color: var(--z8);
+  }
+  .wedge__ramp span + span {
+    box-shadow: inset 1px 0 0 rgb(13 13 13 / 0.18);
+  }
+  .wedge__ramp b {
+    font-weight: 700;
+  }
+  .wedge__ramp i {
+    font-style: normal;
+    font-size: 0.75rem;
+    opacity: 0.85;
+  }
+  .wedge--compact .wedge__ramp i {
+    display: none;
+  }
+
+  .wedge__inner {
+    position: relative;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(11, 1fr);
+    align-items: start;
+  }
+  .wedge__title {
+    grid-column: 1 / 6;
+    padding: 22px 0 0 var(--gutter);
+  }
+  .wedge__name {
+    font-size: clamp(3.5rem, 6.1vw, 5.5rem);
+    line-height: 0.86;
+    white-space: nowrap;
+  }
+  .wedge--compact .wedge__name {
+    font-size: clamp(2.75rem, 4.2vw, 3.75rem);
+  }
+  .wedge__name a {
+    text-decoration: none;
+  }
+  .wedge__sub {
+    margin: 12px 0 0 2px;
+    font: 500 1.0625rem/1.2 var(--f-legend);
+    letter-spacing: 0.02em;
+    color: var(--z8);
+  }
+
+  /* one nav item per light zone: VIII, IX, X */
+  .wedge__nav {
+    grid-column: 9 / 12;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding-top: 34px;
+  }
+  .wedge--compact .wedge__nav {
+    padding-top: 30px;
+  }
+  .wedge__nav a {
+    justify-self: start;
+    margin-left: 14px;
+    padding-bottom: 8px;
+    color: var(--z0);
+    text-decoration: none;
+    font: 700 clamp(0.8125rem, 1.3vw, 1.1875rem) / 1 var(--f-legend);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    background: linear-gradient(var(--filter), var(--filter)) left bottom / 0 3px no-repeat;
+    transition: background-size 280ms var(--ease-out);
+  }
+  .wedge__nav a:hover,
+  .wedge__nav a[aria-current='page'] {
+    background-size: 100% 3px;
+  }
+
+  @media (max-width: 1100px) {
+    .wedge__title {
+      grid-column: 1 / 9;
+    }
+  }
+
+  /* Narrow: title on the dark end, the labelled ramp below it, nav on the light end */
+  @media (max-width: 760px) {
+    .wedge,
+    .wedge--compact {
+      display: flex;
+      flex-direction: column;
+      height: auto;
+      background: var(--z0);
+    }
+    .wedge__inner {
+      display: contents;
+    }
+    .wedge__title {
+      order: 1;
+      padding: 22px var(--gutter) 18px;
+    }
+    .wedge__name,
+    .wedge--compact .wedge__name {
+      font-size: clamp(2.5rem, 12vw, 3.5rem);
+    }
+    .wedge__ramp {
+      order: 2;
+      position: static;
+      height: 44px;
+    }
+    .wedge__ramp span {
+      padding: 0 0 7px 5px;
+      font-size: 0.6875rem;
+      letter-spacing: 0.04em;
+    }
+    .wedge__ramp i {
+      display: none;
+    }
+    .wedge__nav {
+      order: 3;
+      display: flex;
+      gap: 30px;
+      padding: 14px var(--gutter) 12px;
+      background: var(--z10);
+    }
+    .wedge__nav a {
+      margin-left: 0;
+      padding: 6px 0 9px;
+      font-size: 1rem;
+    }
+  }
+</style>

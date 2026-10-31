@@ -1,0 +1,161 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { pluginTypeLabel } from '../lib/plugin-types';
+import { withBase } from '../lib/url';
+
+interface Props {
+  plugins: CollectionEntry<'plugins'>[];
+  headingId?: string;
+}
+
+const { plugins, headingId } = Astro.props;
+---
+<div class="plan" role="table" aria-labelledby={headingId} aria-rowcount={plugins.length + 1}>
+  <div class="plan__row plan__head legend" role="row">
+    <span role="columnheader">Plugin</span>
+    <span role="columnheader">Type</span>
+    <span role="columnheader">Version</span>
+    <span role="columnheader">Resolve</span>
+    <span role="columnheader">Edition</span>
+    <span role="columnheader">Access</span>
+    <span role="columnheader" class="visually-hidden">Summary</span>
+  </div>
+  {plugins.map((p) => (
+    <div class="plan__row" role="row">
+      <span class="plan__name" role="cell">
+        <a class="ln ln--quiet" href={withBase(`plugins/${p.id}/`)}>{p.data.title}</a>
+        {p.data.draft && <span class="draft-tag">Draft</span>}
+      </span>
+      <span role="cell"><span class="plan__label">Type</span>{pluginTypeLabel[p.data.type]}</span>
+      <span role="cell" class="n"><span class="plan__label">Version</span>{p.data.version}</span>
+      <span role="cell" class="n"><span class="plan__label">Resolve</span>{p.data.compatibility.resolve}</span>
+      <span role="cell"><span class="plan__label">Edition</span>{p.data.compatibility.edition === 'free' ? 'Resolve Free' : 'Studio only'}</span>
+      <span role="cell" class="plan__access">
+        <span class="plan__label">Access</span>
+        {p.data.access.kind === 'free' ? 'Free download' : <span class="is-paid n">{p.data.access.price}</span>}
+      </span>
+      <span class="plan__summary" role="cell">{p.data.summary}</span>
+    </div>
+  ))}
+</div>
+
+<style>
+  .plan {
+    width: 100%;
+    border-top: 1px solid var(--z0);
+    container: plan / inline-size;
+  }
+  .plan__row {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 8.75rem 4.25rem 4.25rem 6.25rem 7rem;
+    gap: 0 16px;
+    align-items: baseline;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--z8);
+    color: var(--z0);
+  }
+  .plan__head {
+    padding: 10px 0;
+    font-size: 0.8125rem;
+    color: var(--z4);
+    border-bottom-color: var(--z0);
+  }
+  .plan__row:not(.plan__head) {
+    transition: background-color 200ms var(--ease-out);
+  }
+  .plan__row:not(.plan__head):hover .plan__name a {
+    background-size: 100% 2px, 100% 1px;
+  }
+  .plan__row:not(.plan__head):hover {
+    background: var(--z9);
+  }
+  .plan__name a {
+    text-wrap: balance;
+    font: 800 2rem/0.95 var(--f-display);
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+  /* the whole row opens the plugin */
+  .plan__name a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .plan__name a:focus-visible {
+    outline: none;
+  }
+  .plan__name a:focus-visible::after {
+    outline: 2px solid var(--filter);
+    outline-offset: -2px;
+  }
+  .plan__name .draft-tag {
+    position: relative;
+    z-index: 1;
+    align-self: center;
+  }
+  .plan__name {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 10px;
+  }
+  .plan__summary {
+    grid-column: 1 / -1;
+    max-width: 66ch;
+    margin-top: 8px;
+    font-size: 1rem;
+    line-height: 1.45;
+    color: var(--z3);
+  }
+  .plan__access {
+    font: 600 0.9375rem/1.2 var(--f-legend);
+    letter-spacing: 0.02em;
+  }
+  .is-paid {
+    display: inline-block;
+    position: relative;
+    isolation: isolate;
+    justify-self: start;
+    padding: 2px 8px;
+    border: 1px solid var(--z0);
+    font-size: 1rem;
+  }
+  .is-paid::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    color: var(--z7);
+    background: var(--hatch);
+  }
+  .plan__label {
+    display: none;
+  }
+
+  @container plan (max-width: 760px) {
+    .plan__head {
+      display: none;
+    }
+    .plan__row {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px 20px;
+    }
+    .plan__name {
+      grid-column: 1 / -1;
+    }
+    .plan__summary {
+      grid-row: 2;
+      margin: 0 0 6px;
+    }
+    .plan__label {
+      display: block;
+      margin-bottom: 2px;
+      font: 600 0.75rem/1.2 var(--f-legend);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--z4);
+    }
+  }
+</style>

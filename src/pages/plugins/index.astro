@@ -1,0 +1,70 @@
+---
+import Base from '../../layouts/Base.astro';
+import PluginTable from '../../components/PluginTable.astro';
+import { getPlugins } from '../../lib/content';
+
+const plugins = await getPlugins();
+---
+<Base title="Plugins" description="DaVinci Resolve Fusion macros with version, compatibility, install steps and downloads." current="plugins">
+  <div class="index">
+    <header class="index__head">
+      <h1 class="display index__title">Plugins</h1>
+      <p class="index__intro">
+        Fusion tools for DaVinci Resolve. Each one lists the Resolve version and edition it needs, how to install it,
+        and what changed in every release.
+      </p>
+    </header>
+
+    <div class="sheet-wrap">
+      <div class="sheet index__sheet" data-reveal=".plan__row">
+        {plugins.length > 0 ? (
+          <PluginTable plugins={plugins} />
+        ) : (
+          <p class="index__empty">No plugins published yet. The first Fusion macros are being finished.</p>
+        )}
+      </div>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .index {
+    margin: 0 auto;
+    max-width: 1320px;
+    padding: 48px var(--gutter) 0;
+  }
+  .index__head {
+    display: grid;
+    grid-template-columns: auto minmax(0, 44ch);
+    gap: 16px 56px;
+    align-items: end;
+    margin-bottom: 36px;
+  }
+  .index__title {
+    font-size: clamp(4rem, 9vw, 7.5rem);
+    color: var(--z10);
+  }
+  .index__intro {
+    margin: 0 0 10px;
+    font: 500 1.1875rem/1.45 var(--f-legend);
+    letter-spacing: 0.01em;
+    color: var(--z8);
+  }
+  .index__sheet {
+    padding: 30px clamp(20px, 3vw, 40px) 36px;
+    animation: settle 800ms var(--ease-settle) both;
+  }
+  .index__empty {
+    margin: 0;
+    font-size: 1.125rem;
+    color: var(--z2);
+  }
+  @media (max-width: 760px) {
+    .index {
+      padding-top: 28px;
+    }
+    .index__head {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,31 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { pluginTypeLabel } from '../lib/plugin-types';
+import { isoDate, osLabel } from '../lib/format';
+
+interface Props {
+  plugin: CollectionEntry<'plugins'>;
+  full?: boolean;
+}
+
+const { plugin, full = false } = Astro.props;
+const d = plugin.data;
+---
+<table class="rec">
+  <caption class="visually-hidden">{d.title} details</caption>
+  <tbody>
+    <tr><th scope="row">Version</th><td><span class="n">{d.version}</span>{d.updated && <span class="aside">updated <span class="n">{isoDate(d.updated)}</span></span>}</td></tr>
+    {full && <tr><th scope="row">Type</th><td>{pluginTypeLabel[d.type]}</td></tr>}
+    <tr><th scope="row">Resolve</th><td><span class="n">{d.compatibility.resolve}</span></td></tr>
+    <tr>
+      <th scope="row">Edition</th>
+      <td>{d.compatibility.edition === 'free' ? 'Resolve Free' : 'Resolve Studio'}<span class="aside">{d.compatibility.edition === 'free' ? 'Studio works too' : 'Free edition not supported'}</span></td>
+    </tr>
+    {full && <tr><th scope="row">System</th><td>{d.compatibility.os.map((o) => osLabel[o]).join(' · ')}</td></tr>}
+    {full && <tr><th scope="row">Released</th><td><span class="n">{isoDate(d.released)}</span></td></tr>}
+    {d.access.kind === 'free' && d.access.fileName && (
+      <tr><th scope="row">File</th><td>{d.access.fileName}{d.access.fileSize && <span class="aside n">{d.access.fileSize}</span>}</td></tr>
+    )}
+    {d.access.kind === 'paid' && <tr><th scope="row">Price</th><td><span class="n">{d.access.price}</span><span class="aside">external store</span></td></tr>}
+  </tbody>
+</table>

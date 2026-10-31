@@ -1,0 +1,714 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import PluginFacts from './PluginFacts.astro';
+import AccessAction from './AccessAction.astro';
+import MacroFigure from './MacroFigure.astro';
+import Icon from './Icon.astro';
+import { pluginTypeLabel } from '../lib/plugin-types';
+import { withBase } from '../lib/url';
+
+interface Props {
+  /** First entry is the sheet on top of the pile. */
+  plugins: CollectionEntry<'plugins'>[];
+}
+
+const plugins = Astro.props.plugins.slice(0, 8);
+const total = plugins.length;
+const slot = (i: number) => (i < 3 ? String(i) : 'rest');
+---
+<div class="deck" data-deck role="region" aria-roledescription="carousel" aria-label="Plugins on the light table">
+  <div class="deck__pile">
+    {plugins.map((p, i) => {
+      const d = p.data;
+      const href = withBase(`plugins/${p.id}/`);
+      return (
+        <article
+          class:list={['card', { 'card--print': d.cover }]}
+          style={d.cover ? `--print-lift: ${d.coverBrightness}` : undefined}
+          data-card
+          data-pos={slot(i)}
+          data-title={d.title}
+          aria-roledescription="slide"
+          aria-label={`${i + 1} of ${total}: ${d.title}`}
+          inert={i >= 3}
+        >
+          <div class="card__paper">
+            {d.cover && (
+              <div class="print">
+                <Image
+                  src={d.cover}
+                  alt={d.coverAlt ?? ''}
+                  widths={[640, 960, 1280, 1600]}
+                  sizes="(max-width: 760px) 100vw, 800px"
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                  draggable="false"
+                />
+              </div>
+            )}
+            <div class="face face--front">
+              <header class="top__head">
+                <h2 class="display top__title"><a href={href} draggable="false">{d.title}</a></h2>
+                <span class="legend top__type">{pluginTypeLabel[d.type]}</span>
+                {d.draft && <span class="draft-tag">Draft</span>}
+              </header>
+              <p class="top__lede">{d.summary}</p>
+              <div class:list={['top__grid', { 'top__grid--solo': d.controls.length === 0 }]}>
+                <div class="top__main">
+                  <PluginFacts plugin={p} />
+                  <div class="top__act">
+                    <AccessAction plugin={p} />
+                    <a class="top__more" href={href} draggable="false"><span class="ln">Controls and install steps</span><Icon name="arrow" /></a>
+                  </div>
+                </div>
+                {d.controls.length > 0 && (
+                  <MacroFigure uid={p.id} title={d.title} typeLabel={pluginTypeLabel[d.type]} controls={d.controls} />
+                )}
+              </div>
+            </div>
+
+            <a class="face face--back" href={href} data-bring draggable="false">
+              <span class="back__row">
+                <span class="back__title">{d.title}</span>
+                {d.access.kind === 'paid' && (
+                  <span class="back__hold"><span class="n">{d.access.price}</span><span class="legend">Store</span></span>
+                )}
+              </span>
+              <span class="back__spec legend">
+                {pluginTypeLabel[d.type]} · v<span class="n">{d.version}</span> · Resolve <span class="n">{d.compatibility.resolve}</span>
+              </span>
+            </a>
+          </div>
+        </article>
+      );
+    })}
+  </div>
+
+  {total > 1 && (
+    <div class="deck__nav">
+      <button class="deck__btn" type="button" data-prev aria-label="Previous plugin"><Icon name="back" /></button>
+      <span class="deck__count n" data-count aria-hidden="true">1 / {total}</span>
+      <button class="deck__btn" type="button" data-next aria-label="Next plugin"><Icon name="arrow" /></button>
+      <span class="deck__hint legend">
+        <span class="hint--fine">Drag the top sheet to flip through</span>
+        <span class="hint--coarse">Swipe the top sheet to flip through</span>
+      </span>
+      <p class="visually-hidden" data-live aria-live="polite"></p>
+    </div>
+  )}
+</div>
+
+<style>
+  /* ── The pile: every sheet stacks in one grid cell ───────────────── */
+  /* a lone sheet has nothing behind it to reveal */
+  .deck__pile:has(> .card:only-child) {
+    --top-offset: 24px;
+  }
+  .deck__pile {
+    --top-offset: 100px;
+    display: grid;
+  }
+  .card {
+    grid-area: 1 / 1;
+    align-self: start;
+    position: relative;
+    --rot: 0deg;
+    transform: rotate(var(--rot));
+    transform-origin: 50% 40%;
+    transition:
+      transform 640ms var(--ease-settle),
+      width 520ms var(--ease-out),
+      margin 520ms var(--ease-out),
+      opacity 320ms var(--ease-out),
+      filter 400ms var(--ease-out);
+  }
+  .card[data-pos='0'] {
+    z-index: 5;
+    width: min(100%, 800px);
+    margin: var(--top-offset) 0 0 clamp(0px, 3vw, 40px);
+    --rot: -0.8deg;
+    filter: drop-shadow(0 28px 34px rgb(13 13 13 / 0.62)) drop-shadow(0 2px 3px rgb(13 13 13 / 0.4));
+  }
+  .card[data-pos='1'] {
+    z-index: 4;
+    width: min(54%, 520px);
+    margin: 0;
+    --rot: -2.2deg;
+  }
+  .card[data-pos='2'] {
+    z-index: 3;
+    width: min(54%, 520px);
+    margin: 6px 0 0 46%;
+    --rot: 2.4deg;
+  }
+  .card[data-pos='rest'] {
+    z-index: 1;
+    width: min(54%, 520px);
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+    --rot: -2.2deg;
+  }
+
+  /* while held, the sheet follows the hand */
+  .card.is-held {
+    transition: none;
+    transform: translate(var(--dx, 0px), var(--dy, 0px)) rotate(calc(var(--rot) + var(--tilt, 0deg)));
+  }
+
+  @media (hover: hover) and (min-width: 761px) {
+    .card[data-pos='1']:hover,
+    .card[data-pos='1']:focus-within {
+      transform: translate(-6px, -16px) rotate(-3.4deg);
+    }
+    .card[data-pos='2']:hover,
+    .card[data-pos='2']:focus-within {
+      transform: translate(6px, -16px) rotate(3.6deg);
+    }
+  }
+
+  /* ── Paper: opaque record sheet on top, tracing sheets behind ──── */
+  .card__paper {
+    position: relative;
+    background: rgb(189 189 189 / 0.12);
+    border: 1px solid rgb(242 242 242 / 0.2);
+    color: var(--z9);
+    clip-path: polygon(0 0, 100% 0, 100% 26px, calc(100% - 11px) 34px, 100% 42px, 100% 100%, 0 100%);
+    transition: background-color 420ms var(--ease-out), border-color 420ms var(--ease-out);
+  }
+  .card[data-pos='0'] .card__paper {
+    background: var(--z10);
+    border-color: var(--z10);
+    color: var(--z1);
+    cursor: grab;
+    touch-action: pan-y;
+  }
+  .card.is-held .card__paper {
+    cursor: grabbing;
+  }
+
+  /* hover: the top sheet tips toward the pointer (motion.ts) under the table lamp */
+  .card[data-pos='0'] {
+    perspective: 1600px;
+  }
+  .card__paper::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      circle at var(--gx, 50%) var(--gy, 30%),
+      rgb(255 255 255 / 0.5) 0,
+      transparent 32%,
+      rgb(13 13 13 / 0.07) 85%
+    );
+    mix-blend-mode: soft-light;
+    opacity: 0;
+    transition: opacity 500ms var(--ease-out);
+  }
+  .card__paper.is-lit::after {
+    opacity: 1;
+  }
+  @media (hover: hover) {
+    .card[data-pos='0']:hover {
+      filter: drop-shadow(0 40px 46px rgb(13 13 13 / 0.68)) drop-shadow(0 3px 5px rgb(13 13 13 / 0.42));
+    }
+  }
+  [data-deck].is-dragging {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .card[data-pos='0'] .card__paper a {
+    -webkit-user-drag: none;
+  }
+
+  .face--front {
+    display: none;
+    padding: 34px 40px;
+  }
+  .card[data-pos='0'] .face--front {
+    display: block;
+    animation: face-in 480ms var(--ease-out);
+  }
+  @keyframes face-in {
+    from {
+      opacity: 0.3;
+      transform: translateY(6px);
+    }
+  }
+  .face--back {
+    display: block;
+    min-height: 300px;
+    padding: 16px 24px;
+    color: var(--z9);
+    text-decoration: none;
+    transition: background-color 300ms var(--ease-out);
+  }
+  .face--back:hover,
+  .face--back:focus-visible {
+    background: rgb(189 189 189 / 0.08);
+  }
+  .face--back:focus-visible {
+    outline-offset: -4px;
+  }
+  .card[data-pos='0'] .face--back {
+    display: none;
+  }
+
+  /* ── Sheet content ──────────────────────────────────────────────── */
+  .top__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 10px 18px;
+  }
+  .top__title {
+    font-size: clamp(3rem, 5vw, 4.375rem);
+    color: var(--z0);
+  }
+  .top__title a {
+    text-decoration: none;
+  }
+  .top__type {
+    color: var(--z4);
+  }
+  .top__lede {
+    max-width: 40em;
+    margin: 16px 0 0;
+    font-size: 1.1875rem;
+    line-height: 1.5;
+    color: var(--z2);
+  }
+  .top__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 15rem;
+    gap: 36px;
+    margin-top: 24px;
+    align-items: start;
+  }
+  .top__grid--solo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* ── Print: a sheet with a photograph, black and white until the pointer
+     brings the colour up, the way filtration does on the enlarger ───────── */
+  .print {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .print img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(1) brightness(var(--print-lift, 1)) contrast(1.15);
+    transform: scale(1.02);
+    transition:
+      filter 900ms var(--ease-out),
+      transform 1600ms var(--ease-out),
+      opacity 420ms var(--ease-out);
+  }
+  /* the scrim keeps the record legible over the image */
+  .print::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, rgb(13 13 13 / 0.86) 0%, rgb(13 13 13 / 0.68) 46%, rgb(13 13 13 / 0.5) 100%);
+    transition: opacity 900ms var(--ease-out);
+  }
+  .card--print .face {
+    position: relative;
+  }
+  .card--print[data-pos='0'] .card__paper {
+    background: var(--z0);
+    border-color: var(--z0);
+  }
+  /* behind the top sheet the print shows faintly through the tracing paper */
+  .card--print:not([data-pos='0']) .print img {
+    opacity: 0.4;
+  }
+  @media (hover: hover) {
+    .card--print:hover .print img {
+      filter: grayscale(0) contrast(1) brightness(1);
+      transform: scale(1.05);
+    }
+    .card--print:not([data-pos='0']):hover .print img {
+      opacity: 0.75;
+    }
+    .card--print[data-pos='0']:hover .print::after {
+      opacity: 0.82;
+    }
+  }
+  .card--print[data-pos='0'] .card__paper:active .print img,
+  .card--print:has(:focus-visible) .print img {
+    filter: grayscale(0) contrast(1) brightness(1);
+  }
+
+  /* on a print the record reads as a negative: the zone ramp inverts */
+  .card--print .face--front {
+    --z0: #f2f2f2;
+    --z1: #d8d8d8;
+    --z2: #bdbdbd;
+    --z3: #a6a6a6;
+    --z4: #8f8f8f;
+    --z6: #555555;
+    --z7: #3b3b3b;
+    --z8: rgb(242 242 242 / 0.22);
+    --z9: rgb(242 242 242 / 0.1);
+    --z10: #0d0d0d;
+  }
+  .card--print .face--front :global(.act--download) {
+    color: #f2f2f2;
+  }
+  .card--print .face--front :global(.mfig__node) {
+    fill: #0d0d0d;
+  }
+  .top__act {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 28px;
+    margin-top: 26px;
+  }
+  .top__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    color: var(--z1);
+    font-size: 1.0625rem;
+  }
+  .top__more svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 240ms var(--ease-out);
+  }
+
+  .back__row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .back__title {
+    display: block;
+    font: 800 1.75rem/1 var(--f-display);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--z10);
+  }
+  .back__spec {
+    display: block;
+    margin-top: 7px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    color: var(--z8);
+  }
+  .back__spec .n {
+    font-size: 0.875rem;
+    color: var(--z9);
+  }
+  /* paid: held back, a hatched stamp beside the title */
+  .back__hold {
+    position: relative;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 4px 10px 3px;
+    border: 1px solid var(--z7);
+    color: var(--z10);
+    isolation: isolate;
+  }
+  .back__hold::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    color: rgb(242 242 242 / 0.22);
+    background: var(--hatch);
+  }
+  .back__hold .n {
+    font-size: 1.375rem;
+    line-height: 1;
+  }
+  .back__hold .legend {
+    font-size: 0.6875rem;
+    color: var(--z8);
+  }
+
+  /* ── Controls ───────────────────────────────────────────────────── */
+  .deck__nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+    margin: 34px 0 0 clamp(0px, 3vw, 40px);
+  }
+  .deck__btn {
+    display: inline-grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid var(--z5);
+    background: transparent;
+    color: var(--z10);
+    cursor: pointer;
+    transition: background-color 200ms var(--ease-out), border-color 200ms var(--ease-out);
+  }
+  .deck__btn svg {
+    width: 16px;
+    height: 16px;
+  }
+  .deck__btn:hover {
+    background: var(--z3);
+    border-color: var(--z7);
+  }
+  .deck__count {
+    min-width: 4.5ch;
+    text-align: center;
+    font-size: 0.9375rem;
+    color: var(--z10);
+  }
+  .deck__hint {
+    margin-left: 14px;
+    font-size: 0.8125rem;
+    color: var(--z7);
+  }
+  .hint--coarse {
+    display: none;
+  }
+  @media (pointer: coarse) {
+    .hint--fine {
+      display: none;
+    }
+    .hint--coarse {
+      display: inline;
+    }
+  }
+
+  /* Narrow: one sheet on top, the rest peek out above it as a pile */
+  @media (max-width: 760px) {
+    .deck__pile {
+      --top-offset: 26px;
+    }
+    .card,
+    .card[data-pos='0'],
+    .card[data-pos='1'],
+    .card[data-pos='2'],
+    .card[data-pos='rest'] {
+      width: 100%;
+      transform-origin: 50% 0;
+    }
+    .card[data-pos='0'] {
+      margin: var(--top-offset) 0 0;
+      --rot: 0deg;
+    }
+    .card[data-pos='1'] {
+      margin: 13px 0 0;
+      --rot: 0deg;
+      transform: scale(0.95);
+    }
+    .card[data-pos='2'] {
+      margin: 0;
+      --rot: 0deg;
+      transform: scale(0.9);
+    }
+    .card[data-pos='rest'] {
+      margin: 0;
+      --rot: 0deg;
+      transform: scale(0.9);
+    }
+    .card:not([data-pos='0']) {
+      pointer-events: none;
+    }
+    .card:not([data-pos='0']) .face--back > * {
+      visibility: hidden;
+    }
+    .face--front {
+      padding: 26px 20px 28px;
+    }
+    .top__grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .deck__nav {
+      margin-left: 0;
+    }
+    .deck__hint {
+      flex-basis: 100%;
+      margin: 4px 0 0;
+    }
+  }
+</style>
+
+<script>
+  const FLIP_DISTANCE = 110; // px the top sheet must travel to go under the pile
+  const FLICK_DISTANCE = 50; // a shorter pull still flips when it is a quick flick...
+  const FLICK_SPEED = 0.6; // ...faster than this, in px/ms over the last moments of the drag
+
+  function setupDeck(root: HTMLElement) {
+    const cards = Array.from(root.querySelectorAll<HTMLElement>('[data-card]'));
+    if (cards.length < 2) return;
+
+    const count = root.querySelector<HTMLElement>('[data-count]');
+    const live = root.querySelector<HTMLElement>('[data-live]');
+    let order = cards.map((_, i) => i);
+
+    function render(announce: boolean) {
+      order.forEach((cardIndex, slot) => {
+        const card = cards[cardIndex];
+        card.dataset.pos = slot < 3 ? String(slot) : 'rest';
+        card.inert = slot >= 3;
+      });
+      const top = order[0];
+      if (count) count.textContent = `${top + 1} / ${cards.length}`;
+      if (announce && live) live.textContent = `${cards[top].dataset.title}, ${top + 1} of ${cards.length}`;
+    }
+
+    // top sheet goes to the bottom of the pile
+    const next = () => {
+      order.push(order.shift()!);
+      render(true);
+    };
+    // bottom sheet comes back to the top
+    const prev = () => {
+      order.unshift(order.pop()!);
+      render(true);
+    };
+    const bring = (cardIndex: number) => {
+      while (order[0] !== cardIndex) order.push(order.shift()!);
+      render(true);
+    };
+
+    root.querySelector('[data-next]')?.addEventListener('click', next);
+    root.querySelector('[data-prev]')?.addEventListener('click', prev);
+
+    root.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        next();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prev();
+      }
+    });
+
+    // clicking a sheet behind brings it to the top instead of leaving the page
+    cards.forEach((card, i) => {
+      card.querySelector('[data-bring]')?.addEventListener('click', (e) => {
+        if (card.dataset.pos === '0') return;
+        e.preventDefault();
+        bring(i);
+        cards[i].querySelector<HTMLElement>('.top__title a')?.focus({ preventScroll: true });
+      });
+    });
+
+    // ── drag the top sheet ──
+    let held: {
+      card: HTMLElement;
+      id: number;
+      x: number;
+      y: number;
+      moving: boolean;
+      trail: { x: number; t: number }[];
+    } | null = null;
+
+    root.addEventListener('dragstart', (e) => e.preventDefault());
+
+    root.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0 || !e.isPrimary) return;
+      const card = (e.target as HTMLElement).closest<HTMLElement>('[data-card]');
+      if (!card || card.dataset.pos !== '0') return;
+      held = { card, id: e.pointerId, x: e.clientX, y: e.clientY, moving: false, trail: [] };
+    });
+
+    root.addEventListener('pointermove', (e) => {
+      if (!held || e.pointerId !== held.id) return;
+      const dx = e.clientX - held.x;
+      const dy = e.clientY - held.y;
+      if (!held.moving) {
+        if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(dy)) {
+          if (Math.abs(dy) > 12) held = null; // vertical scroll wins
+          return;
+        }
+        held.moving = true;
+        held.card.classList.add('is-held');
+        root.classList.add('is-dragging');
+        held.card.setPointerCapture(e.pointerId);
+      }
+      const now = performance.now();
+      held.trail.push({ x: e.clientX, t: now });
+      while (held.trail.length > 2 && now - held.trail[0].t > 100) held.trail.shift();
+      held.card.style.setProperty('--dx', `${dx}px`);
+      held.card.style.setProperty('--dy', `${dy * 0.18}px`);
+      held.card.style.setProperty('--tilt', `${dx * 0.025}deg`);
+    });
+
+    const release = (e: PointerEvent) => {
+      if (!held || e.pointerId !== held.id) return;
+      const { card, moving, x, trail } = held;
+      held = null;
+      if (!moving) return;
+
+      const dx = e.clientX - x;
+      const first = trail[0];
+      const speed = first ? Math.abs(e.clientX - first.x) / Math.max(16, performance.now() - first.t) : 0;
+      const flips = Math.abs(dx) > FLIP_DISTANCE || (Math.abs(dx) > FLICK_DISTANCE && speed > FLICK_SPEED);
+      card.classList.remove('is-held');
+      root.classList.remove('is-dragging');
+      card.style.removeProperty('--dx');
+      card.style.removeProperty('--dy');
+      card.style.removeProperty('--tilt');
+
+      // a drag is not a click on whatever was under the pointer
+      const swallow = (ev: Event) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+      };
+      window.addEventListener('click', swallow, { capture: true, once: true });
+      setTimeout(() => window.removeEventListener('click', swallow, { capture: true }), 0);
+
+      if (e.type === 'pointerup' && flips) next();
+    };
+    root.addEventListener('pointerup', release);
+    root.addEventListener('pointercancel', release);
+
+    // ── keep the pile one height, so what sits below never moves on a flip ──
+    // Each plugin's sheet has a different length; size the pile to the tallest
+    // one, measured off-screen at the top sheet's width.
+    const pile = root.querySelector<HTMLElement>('.deck__pile')!;
+    function fitPile() {
+      const topPaper = cards[order[0]].querySelector<HTMLElement>('.card__paper')!;
+      const probe = document.createElement('div');
+      probe.setAttribute('aria-hidden', 'true');
+      probe.inert = true;
+      probe.style.cssText = `position:absolute;left:-10000px;top:0;visibility:hidden;width:${topPaper.clientWidth}px`;
+      cards.forEach((card) => {
+        const face = card.querySelector<HTMLElement>('.face--front')!.cloneNode(true) as HTMLElement;
+        face.style.display = 'block';
+        face.style.animation = 'none';
+        probe.appendChild(face);
+      });
+      document.body.appendChild(probe);
+      const tallest = Math.max(...Array.from(probe.children, (face) => (face as HTMLElement).offsetHeight));
+      probe.remove();
+      const offset = parseFloat(getComputedStyle(pile).getPropertyValue('--top-offset')) || 0;
+      const borders = topPaper.offsetHeight - topPaper.clientHeight;
+      pile.style.minHeight = `${Math.ceil(offset + tallest + borders)}px`;
+    }
+
+    let lastWidth = 0;
+    new ResizeObserver(([entry]) => {
+      const width = Math.round(entry.contentRect.width);
+      if (width === lastWidth) return;
+      lastWidth = width;
+      fitPile();
+    }).observe(pile);
+    document.fonts?.ready.then(fitPile);
+
+    render(false);
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-deck]').forEach(setupDeck);
+</script>

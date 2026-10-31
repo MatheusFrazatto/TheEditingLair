@@ -1,0 +1,89 @@
+---
+import { withBase } from '../lib/url';
+import Icon from './Icon.astro';
+
+const year = new Date().getFullYear();
+---
+<footer class="foot">
+  <div class="foot__strip" aria-hidden="true">
+    {Array.from({ length: 11 }, (_, i) => <span style={`background: var(--z${i})`} />)}
+  </div>
+  <div class="foot__inner">
+    <p class="foot__name display">The Editing Lair</p>
+    <ul class="foot__links legend">
+      <li><a href={withBase('plugins/')}><span class="ln ln--quiet">Plugins</span></a></li>
+      <li><a href={withBase('notes/')}><span class="ln ln--quiet">Notes</span></a></li>
+      <li><a href={withBase('about/')}><span class="ln ln--quiet">About</span></a></li>
+      <li><a href={withBase('rss.xml')}><Icon name="rss" /><span class="ln ln--quiet">RSS</span></a></li>
+    </ul>
+    <p class="foot__fine">
+      <span class="n">© {year}</span> Cadenzy. DaVinci Resolve and Fusion are trademarks of Blackmagic Design;
+      this site is independent and not affiliated with them.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    margin-top: clamp(64px, 9vw, 120px);
+    background: var(--z1);
+    color: var(--z8);
+  }
+  .foot__strip {
+    display: grid;
+    grid-template-columns: repeat(11, 1fr);
+    height: 10px;
+  }
+  .foot__inner {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 18px 48px;
+    align-items: baseline;
+    padding: 36px var(--gutter) 44px;
+  }
+  .foot__name {
+    font-size: 2.25rem;
+    color: var(--z10);
+  }
+  .foot__links {
+    justify-self: end;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 32px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .foot__links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    color: var(--z9);
+    text-decoration: none;
+  }
+  .foot__links a:hover {
+    color: var(--z10);
+  }
+  .foot__links svg {
+    width: 15px;
+    height: 15px;
+  }
+  .foot__fine {
+    grid-column: 1 / -1;
+    max-width: 70ch;
+    margin: 0;
+    font: 500 0.9375rem/1.5 var(--f-legend);
+    letter-spacing: 0.01em;
+    line-height: 1.55;
+    color: var(--z7);
+  }
+  @media (max-width: 760px) {
+    .foot__inner {
+      grid-template-columns: 1fr;
+    }
+    .foot__links {
+      justify-self: start;
+    }
+  }
+</style>

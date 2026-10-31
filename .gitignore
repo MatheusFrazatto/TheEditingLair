@@ -1,0 +1,26 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+
+# environment
+.env
+.env.*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Private project docs and agent context — never published, never committed
+PRODUCT.md
+DESIGN.md
+CLAUDE.md
+docs/
+.claude/
+.impeccable/

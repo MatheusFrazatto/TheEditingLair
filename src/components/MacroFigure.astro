@@ -1,0 +1,75 @@
+---
+interface Props {
+  uid: string;
+  title: string;
+  typeLabel: string;
+  controls: { name: string; default: string }[];
+}
+
+const { uid, title, typeLabel, controls } = Astro.props;
+const capId = `mfig-${uid}`;
+
+const row = 46;
+const top = 14;
+const height = top * 2 + controls.length * row;
+const nodeW = 58;
+const pinX = nodeW;
+const labelX = 112;
+---
+<figure class="mfig">
+  <svg viewBox={`0 0 240 ${height}`} width="240" height={height} role="img" aria-labelledby={capId}>
+    <rect x="0.5" y="0.5" width={nodeW} height={height - 1} fill="var(--z0)" />
+    <text class="mfig__node" transform={`translate(${nodeW / 2 + 5} ${height / 2}) rotate(-90)`} text-anchor="middle">{typeLabel}</text>
+    {controls.map((c, i) => {
+      const y = top + i * row + row / 2;
+      return (
+        <g>
+          <rect x={pinX - 4} y={y - 4} width="8" height="8" fill="var(--z10)" stroke="var(--z0)" />
+          <path d={`M${pinX + 4} ${y} H${labelX - 8}`} stroke="var(--z5)" fill="none" />
+          <text class="mfig__val" x={labelX} y={y - 3}>{c.default}</text>
+          <text class="mfig__name" x={labelX} y={y + 14}>{c.name}</text>
+        </g>
+      );
+    })}
+  </svg>
+  <figcaption id={capId} class="mfig__cap">
+    <span class="visually-hidden">{title} controls and defaults: {controls.map((c) => `${c.name} ${c.default}`).join(', ')}.</span>
+    <span aria-hidden="true">Exposed controls, at their defaults</span>
+  </figcaption>
+</figure>
+
+<style>
+  .mfig {
+    margin: 0;
+    padding-top: 10px;
+    border-top: 1px solid var(--z0);
+  }
+  .mfig svg {
+    width: 100%;
+    max-width: 240px;
+    margin-top: 8px;
+    overflow: visible;
+  }
+  .mfig__node {
+    font: 700 11px var(--f-legend);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    fill: var(--z8);
+  }
+  .mfig__val {
+    font: 500 15px var(--f-mono);
+    fill: var(--z0);
+  }
+  .mfig__name {
+    font: 600 11px var(--f-legend);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    fill: var(--z4);
+  }
+  .mfig__cap {
+    margin-top: 10px;
+    font: 500 0.8125rem/1.3 var(--f-legend);
+    letter-spacing: 0.01em;
+    color: var(--z4);
+  }
+</style>

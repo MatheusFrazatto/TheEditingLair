@@ -1,0 +1,111 @@
+---
+// First visit of a session: the print develops zone by zone, then the ramp
+// collapses into the masthead. Shown only when the inline head script in
+// Base.astro sets html[data-intro="play"], so it never blocks a page without JS
+// or for people who prefer reduced motion.
+const tones = ['#0d0d0d', '#1a1a1a', '#282828', '#3b3b3b', '#555555', '#6e6e6e', '#8f8f8f', '#a6a6a6', '#bdbdbd', '#d8d8d8', '#f2f2f2'];
+const zones = ['0', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+---
+<div class="intro" data-intro-overlay aria-hidden="true">
+  <div class="intro__ramp" data-intro-ramp>
+    {tones.map((tone, i) => (
+      <span class="intro__bar" data-tone={tone} data-dark={i < 5 ? '' : undefined}>
+        <b>{zones[i]}</b>
+      </span>
+    ))}
+  </div>
+  <div class="intro__center" data-intro-center>
+    <p class="display intro__name" data-intro-name>The Editing Lair</p>
+    <p class="legend intro__timer">Exposing <span class="n" data-intro-timer>00.0</span> s</p>
+  </div>
+  <p class="legend intro__skip">Click or press any key to skip</p>
+</div>
+
+<style>
+  .intro {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: none;
+    cursor: pointer;
+  }
+  :global(html:is([data-intro='play'], [data-intro='lifting'])) .intro {
+    display: block;
+  }
+  :global(html[data-intro='play']) body {
+    overflow: hidden;
+  }
+  .intro__ramp {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 100vh;
+    height: 100dvh;
+    display: grid;
+    grid-template-columns: repeat(11, 1fr);
+  }
+  .intro__bar {
+    display: flex;
+    align-items: flex-end;
+    padding: 0 0 12px 14px;
+    background: var(--z0);
+    color: var(--z0);
+    font: 700 1rem/1 var(--f-legend);
+    letter-spacing: 0.14em;
+    box-shadow: inset 1px 0 0 rgb(13 13 13 / 0.18);
+  }
+  .intro__bar[data-dark] {
+    color: var(--z8);
+  }
+  .intro__bar b {
+    opacity: 0;
+  }
+  .intro__center {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 18px;
+    pointer-events: none;
+  }
+  .intro__name {
+    font-size: clamp(3.5rem, 11vw, 9rem);
+    color: var(--z10);
+    white-space: nowrap;
+    mix-blend-mode: difference;
+  }
+  /* the enlarger timer: its own dark readout, legible over any zone */
+  .intro__timer {
+    margin: 0;
+    padding: 7px 14px 6px;
+    background: var(--z0);
+    color: var(--z7);
+  }
+  .intro__timer .n {
+    display: inline-block;
+    min-width: 4ch;
+    margin: 0 4px;
+    color: var(--z10);
+  }
+  .intro__skip {
+    position: absolute;
+    right: var(--gutter);
+    bottom: 22px;
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--z6);
+    mix-blend-mode: difference;
+  }
+  @media (max-width: 760px) {
+    .intro__bar {
+      padding: 0 0 10px 5px;
+      font-size: 0.6875rem;
+      letter-spacing: 0.04em;
+    }
+    .intro__skip {
+      top: 18px;
+      bottom: auto;
+      left: var(--gutter);
+    }
+  }
+</style>

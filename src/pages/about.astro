@@ -1,0 +1,63 @@
+---
+import Base from '../layouts/Base.astro';
+import { withBase } from '../lib/url';
+---
+<Base title="About" description="What The Editing Lair is, who makes it, and how downloads work." current="about">
+  <div class="page">
+    <div class="sheet-wrap">
+      <article class="sheet doc">
+        <h1 class="display doc__title">About</h1>
+        <div class="prose">
+          <p class="lede">
+            The Editing Lair is where Cadenzy publishes the DaVinci Resolve tools he builds for his own edits, alongside
+            notes on editing curiosities and tools worth knowing.
+          </p>
+
+          <h2>What you will find</h2>
+          <ul>
+            <li><a href={withBase('plugins/')}>Plugins</a>: Fusion macros for now, with scripts, DCTLs and LUTs possible later.</li>
+            <li><a href={withBase('notes/')}>Notes</a>: short posts about editing, Resolve and the tools around it.</li>
+          </ul>
+
+          <h2>How downloads work</h2>
+          <p>
+            Free plugins download directly from this site, with no account or sign-up. Every plugin page lists the Resolve
+            version and edition it needs and how to install it.
+          </p>
+          <p>
+            Paid plugins are sold through an external store, which handles payment, delivery and receipts. This site never
+            asks for payment details.
+          </p>
+
+          <h2>Notice</h2>
+          <p>
+            DaVinci Resolve and Fusion are trademarks of Blackmagic Design. The Editing Lair is an independent project and
+            is not affiliated with or endorsed by Blackmagic Design.
+          </p>
+        </div>
+      </article>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px var(--gutter) 0;
+  }
+  .doc {
+    padding: clamp(26px, 4vw, 52px) clamp(20px, 5vw, 64px) clamp(36px, 5vw, 64px);
+    animation: settle 800ms var(--ease-settle) both;
+  }
+  .doc__title {
+    margin-bottom: 28px;
+    font-size: clamp(3rem, 7vw, 5.75rem);
+    color: var(--z0);
+  }
+  .lede {
+    font-size: 1.3125rem;
+    line-height: 1.5;
+    color: var(--z2);
+  }
+</style>

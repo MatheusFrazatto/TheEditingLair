@@ -1,0 +1,349 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import PluginFacts from '../../components/PluginFacts.astro';
+import AccessAction from '../../components/AccessAction.astro';
+import NoteList from '../../components/NoteList.astro';
+import Icon from '../../components/Icon.astro';
+import { getPlugins, getPosts } from '../../lib/content';
+import { pluginTypeLabel } from '../../lib/plugin-types';
+import { isoDate } from '../../lib/format';
+import { withBase } from '../../lib/url';
+
+export async function getStaticPaths() {
+  const plugins = await getPlugins();
+  return plugins.map((plugin) => ({ params: { slug: plugin.id }, props: { plugin } }));
+}
+
+interface Props {
+  plugin: CollectionEntry<'plugins'>;
+}
+
+const { plugin } = Astro.props;
+const d = plugin.data;
+const { Content } = await render(plugin);
+
+const related = (await getPosts()).filter((p) => p.data.relatedPlugins.includes(plugin.id));
+const others = (await getPlugins()).filter((p) => p.id !== plugin.id).slice(0, 3);
+---
+<Base title={d.title} description={d.summary} current="plugins">
+  <div class="page">
+    <div class="sheet-wrap main-sheet">
+      <article class="sheet doc">
+        <nav class="crumbs legend" aria-label="Breadcrumb">
+          <a class="ln" href={withBase('plugins/')}>Plugins</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">{d.title}</span>
+        </nav>
+
+        <header class="doc__head">
+          <h1 class="display doc__title">{d.title}</h1>
+          <p class="legend doc__type">
+            {pluginTypeLabel[d.type]} · v<span class="n">{d.version}</span>
+            {d.draft && <span class="draft-tag">Draft</span>}
+          </p>
+          <p class="doc__lede">{d.summary}</p>
+        </header>
+
+        <div class="doc__record">
+          <PluginFacts plugin={plugin} full />
+          <div class="doc__get">
+            <AccessAction plugin={plugin} />
+          </div>
+        </div>
+
+        {d.cover && (
+          <figure class="doc__figure" style={`--print-lift: ${d.coverBrightness}`}>
+            <Image src={d.cover} alt={d.coverAlt ?? ''} widths={[640, 960, 1280]} sizes="(max-width: 860px) 100vw, 860px" />
+          </figure>
+        )}
+
+        {d.video && (
+          <p class="doc__video">
+            <a href={d.video} rel="noopener" target="_blank"><Icon name="external" /><span class="ln">Watch the preview video</span></a>
+          </p>
+        )}
+
+        <div class="prose">
+          <Content />
+        </div>
+
+        {d.changelog.length > 0 && (
+          <section class="log" aria-labelledby="log-heading">
+            <h2 class="log__title" id="log-heading">Changelog</h2>
+            <ol class="log__list">
+              {d.changelog.map((entry, i) => (
+                <li class:list={{ current: i === 0 }}>
+                  <span class="n log__ver">{entry.version}</span>
+                  <time class="n log__date" datetime={entry.date.toISOString()}>{isoDate(entry.date)}</time>
+                  <span class="log__notes">{entry.notes}</span>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
+      </article>
+    </div>
+
+    <aside class="rail" aria-label="More from the shelf">
+      {related.length > 0 && (
+        <section class="rail__block">
+          <h2 class="legend rail__title">Notes about it</h2>
+          <div class="rail__notes"><NoteList posts={related} /></div>
+        </section>
+      )}
+      {others.length > 0 && (
+        <section class="rail__block">
+          <h2 class="legend rail__title">Also on the shelf</h2>
+          <ul class="rail__others">
+            {others.map((p) => (
+              <li>
+                <a href={withBase(`plugins/${p.id}/`)}>
+                  <span class="rail__name"><span class="ln ln--quiet">{p.data.title}</span></span>
+                  <span class="rail__spec legend">{pluginTypeLabel[p.data.type]} · <span class="n">{p.data.compatibility.resolve}</span></span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      <a class="rail__back legend" href={withBase('plugins/')}><Icon name="back" /><span class="ln ln--quiet">All plugins</span></a>
+    </aside>
+  </div>
+</Base>
+
+<style>
+  .page {
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 19rem;
+    gap: clamp(32px, 4vw, 64px);
+    max-width: 1320px;
+    padding: 40px var(--gutter) 0;
+  }
+  .main-sheet {
+    animation: settle 800ms var(--ease-settle) both;
+  }
+  .doc {
+    padding: clamp(26px, 4vw, 52px) clamp(20px, 4.4vw, 60px) clamp(32px, 4vw, 56px);
+  }
+  .crumbs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 26px;
+    font-size: 0.8125rem;
+    color: var(--z4);
+  }
+  .crumbs a {
+    color: var(--z2);
+  }
+  .doc__title {
+    font-size: clamp(3rem, 7vw, 5.75rem);
+    color: var(--z0);
+  }
+  .doc__type {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 14px 0 0;
+    color: var(--z4);
+  }
+  .doc__type .n {
+    font-size: 0.875rem;
+    color: var(--z1);
+  }
+  .doc__lede {
+    max-width: 44ch;
+    margin: 20px 0 0;
+    font-size: clamp(1.25rem, 1.8vw, 1.4375rem);
+    line-height: 1.45;
+    color: var(--z2);
+  }
+  .doc__record {
+    display: grid;
+    grid-template-columns: minmax(0, 30rem) minmax(0, 1fr);
+    gap: 28px 44px;
+    align-items: start;
+    margin: 36px 0 48px;
+  }
+  .doc__get {
+    padding-top: 10px;
+  }
+  .doc__figure {
+    overflow: hidden;
+    background: var(--z0);
+    margin: 0 0 40px;
+  }
+  .doc__figure img {
+    width: 100%;
+    filter: grayscale(1) brightness(var(--print-lift, 1)) contrast(1.15);
+    transition: filter 900ms var(--ease-out), transform 1600ms var(--ease-out);
+  }
+  .doc__figure:hover img {
+    filter: none;
+    transform: scale(1.03);
+  }
+  .doc__video a {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--z0);
+  }
+  .doc__video svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* one continuous rule through the versions */
+  .log {
+    max-width: var(--measure);
+    margin-top: 56px;
+  }
+  .log__title {
+    margin: 0 0 18px;
+    padding-top: 0.9em;
+    border-top: 1px solid var(--z8);
+    font: 750 1.375rem/1.15 var(--f-legend);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--z0);
+  }
+  .log__list {
+    position: relative;
+    margin: 0;
+    padding: 0 0 0 26px;
+    list-style: none;
+  }
+  .log__list::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 10px;
+    bottom: 10px;
+    width: 1px;
+    background: var(--z6);
+  }
+  .log__list li {
+    position: relative;
+    display: grid;
+    grid-template-columns: 5rem 7rem minmax(0, 1fr);
+    gap: 4px 16px;
+    padding: 6px 0 14px;
+    color: var(--z3);
+  }
+  .log__list li::before {
+    content: '';
+    position: absolute;
+    left: -25px;
+    top: 13px;
+    width: 9px;
+    height: 9px;
+    border: 1px solid var(--z5);
+    background: var(--z10);
+  }
+  .log__list li.current {
+    color: var(--z0);
+  }
+  .log__list li.current::before {
+    background: var(--z0);
+    border-color: var(--z0);
+  }
+  .log__ver {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  .log__date {
+    font-size: 0.875rem;
+    color: var(--z4);
+    padding-top: 2px;
+  }
+
+  /* ── Rail on the dark ground ─────────────────────────────────────── */
+  .rail {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    padding-top: 8px;
+  }
+  .rail__title {
+    margin: 0 0 14px;
+    font-size: 0.8125rem;
+    color: var(--z7);
+  }
+  .rail__notes {
+    padding: 0 20px;
+    background: var(--z9);
+  }
+  .rail__notes :global(li:first-child) {
+    border-top: 0;
+  }
+  .rail__others {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .rail__others li + li {
+    margin-top: 10px;
+  }
+  .rail__others a {
+    display: block;
+    padding: 14px 18px;
+    background: rgb(189 189 189 / 0.1);
+    border: 1px solid rgb(242 242 242 / 0.18);
+    text-decoration: none;
+    transition: transform 420ms var(--ease-settle), background-color 240ms var(--ease-out);
+  }
+  .rail__others a:hover .ln {
+    background-size: 100% 2px, 100% 1px;
+  }
+  .rail__others a:hover,
+  .rail__others a:focus-visible {
+    transform: translateX(-6px) rotate(-1deg);
+    background: rgb(189 189 189 / 0.18);
+  }
+  .rail__name {
+    display: block;
+    font: 800 1.5rem/1 var(--f-display);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--z10);
+  }
+  .rail__spec {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.8125rem;
+    color: var(--z8);
+  }
+  .rail__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--z9);
+    text-decoration: none;
+  }
+  .rail__back svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  @media (max-width: 1100px) {
+    .page {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .doc__record {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 760px) {
+    .page {
+      padding-top: 20px;
+    }
+    .log__list li {
+      grid-template-columns: auto 1fr;
+    }
+    .log__notes {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

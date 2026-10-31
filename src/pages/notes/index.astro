@@ -1,0 +1,81 @@
+---
+import Base from '../../layouts/Base.astro';
+import NoteList from '../../components/NoteList.astro';
+import Icon from '../../components/Icon.astro';
+import { getPosts } from '../../lib/content';
+import { withBase } from '../../lib/url';
+
+const posts = await getPosts();
+---
+<Base title="Notes" description="Editing curiosities, tools worth knowing and short DaVinci Resolve tutorials." current="notes">
+  <div class="index">
+    <header class="index__head">
+      <h1 class="display index__title">Notes</h1>
+      <p class="index__intro">
+        Editing curiosities, tools worth knowing and short Resolve tutorials.
+        <a href={withBase('rss.xml')}><Icon name="rss" /><span class="ln">Subscribe by RSS</span></a>
+      </p>
+    </header>
+
+    <div class="panel" data-reveal=".notes li">
+      {posts.length > 0 ? <NoteList posts={posts} variant="full" /> : <p class="panel__empty">No notes yet.</p>}
+    </div>
+  </div>
+</Base>
+
+<style>
+  .index {
+    margin: 0 auto;
+    max-width: 1100px;
+    padding: 48px var(--gutter) 0;
+  }
+  .index__head {
+    display: grid;
+    grid-template-columns: auto minmax(0, 40ch);
+    gap: 16px 56px;
+    align-items: end;
+    margin-bottom: 36px;
+  }
+  .index__title {
+    font-size: clamp(4rem, 9vw, 7.5rem);
+    color: var(--z10);
+  }
+  .index__intro {
+    margin: 0 0 10px;
+    font: 500 1.1875rem/1.45 var(--f-legend);
+    letter-spacing: 0.01em;
+    color: var(--z8);
+  }
+  .index__intro a {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    color: var(--z10);
+  }
+  .index__intro svg {
+    width: 15px;
+    height: 15px;
+  }
+  .panel {
+    padding: 6px clamp(20px, 3.4vw, 48px) 10px;
+    background: var(--z9);
+    color: var(--z1);
+  }
+  .panel :global(li:first-child) {
+    border-top: 0;
+  }
+  .panel__empty {
+    margin: 0;
+    padding: 28px 0;
+  }
+  @media (max-width: 760px) {
+    .index {
+      padding-top: 28px;
+    }
+    .index__head {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

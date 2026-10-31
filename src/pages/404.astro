@@ -1,0 +1,64 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { withBase } from '../lib/url';
+---
+<Base title="Page not found">
+  <div class="page">
+    <div class="sheet-wrap">
+      <div class="sheet doc">
+        <p class="legend code">Error <span class="n">404</span></p>
+        <h1 class="display doc__title">This sheet is not in the record</h1>
+        <p class="doc__text">The page may have moved, or the link has a typo. Everything published is reachable from these two lists.</p>
+        <p class="doc__links">
+          <a href={withBase('plugins/')}><span class="ln">All plugins</span><Icon name="arrow" /></a>
+          <a href={withBase('notes/')}><span class="ln">All notes</span><Icon name="arrow" /></a>
+        </p>
+      </div>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 64px var(--gutter) 0;
+  }
+  .doc {
+    padding: clamp(28px, 5vw, 56px);
+  }
+  .code {
+    margin: 0 0 16px;
+    color: var(--z4);
+  }
+  .doc__title {
+    font-size: clamp(2.75rem, 6vw, 4.5rem);
+    color: var(--z0);
+  }
+  .doc__text {
+    max-width: 48ch;
+    margin: 20px 0 28px;
+    font-size: 1.1875rem;
+    color: var(--z2);
+  }
+  .doc__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 36px;
+    margin: 0;
+  }
+  .doc__links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--z0);
+    font: 700 1.125rem/1 var(--f-legend);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .doc__links svg {
+    width: 16px;
+    height: 16px;
+  }
+</style>

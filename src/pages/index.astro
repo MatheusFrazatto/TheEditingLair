@@ -1,0 +1,229 @@
+---
+import Base from '../layouts/Base.astro';
+import SheetDeck from '../components/SheetDeck.astro';
+import PluginTable from '../components/PluginTable.astro';
+import NoteList from '../components/NoteList.astro';
+import Icon from '../components/Icon.astro';
+import { getPlugins, getPosts } from '../lib/content';
+import { resolveFloor } from '../lib/format';
+import { withBase } from '../lib/url';
+
+const plugins = await getPlugins();
+const posts = await getPosts();
+
+const featured = plugins.find((p) => p.data.featured) ?? plugins[0];
+// the featured plugin sits on top of the pile, the rest follow newest first
+const pile = featured ? [featured, ...plugins.filter((p) => p !== featured)] : [];
+
+const freeCount = plugins.filter((p) => p.data.access.kind === 'free').length;
+const paidCount = plugins.length - freeCount;
+const floors = plugins.map((p) => resolveFloor(p.data.compatibility.resolve)).filter((n) => !Number.isNaN(n));
+const oldestResolve = floors.length ? Math.min(...floors).toFixed(1) : null;
+---
+<Base wedge="full">
+  <div class="home">
+    <section class="stage" aria-label="Plugins">
+      {featured ? (
+        <>
+          <SheetDeck plugins={pile} />
+
+          <p class="readout legend">
+            <span>Shelf<span class="n" data-count-to={plugins.length}>{plugins.length}</span></span>
+            <span>Free<span class="n" data-count-to={freeCount}>{freeCount}</span></span>
+            {paidCount > 0 && <span>Paid<span class="n" data-count-to={paidCount}>{paidCount}</span></span>}
+            {oldestResolve && <span>Runs on Resolve<span class="n" data-count-to={oldestResolve} data-suffix="+">{oldestResolve}+</span></span>}
+          </p>
+        </>
+      ) : (
+        <div class="sheet-wrap lift">
+          <div class="sheet top empty">
+            <h2 class="display top__title">Nothing on the shelf yet</h2>
+            <p class="top__lede">The first Fusion macros are being finished. Each one will land here with its version, the Resolve it needs, install steps and a download.</p>
+            <a class="top__more" href={withBase('rss.xml')}><Icon name="rss" /><span class="ln">Follow the notes feed</span></a>
+          </div>
+        </div>
+      )}
+    </section>
+
+    <aside class="side" aria-labelledby="notes-heading">
+      <h2 class="display side__title" id="notes-heading">Notes</h2>
+      {posts.length > 0 ? (
+        <>
+          <NoteList posts={posts.slice(0, 5)} />
+          <a class="side__more legend" href={withBase('notes/')}><span class="ln ln--quiet">All notes</span><Icon name="arrow" /></a>
+        </>
+      ) : (
+        <p class="side__empty">No notes yet. Curiosities, tools and short tutorials will be posted here.</p>
+      )}
+      <p class="side__about">
+        <strong>The Editing Lair</strong> is where Cadenzy publishes the DaVinci Resolve tools he builds for his own
+        edits, with notes on editing curiosities and tools worth knowing. <a href={withBase('about/')}>About the site</a>
+      </p>
+    </aside>
+
+    {plugins.length > 1 && (
+      <section class="shelf" aria-labelledby="shelf-heading" data-reveal=".plan__row, .shelf__title">
+        <div class="sheet-wrap">
+          <div class="sheet shelf__sheet">
+            <h2 class="display shelf__title" id="shelf-heading">Every plugin</h2>
+            <PluginTable plugins={plugins} headingId="shelf-heading" />
+          </div>
+        </div>
+      </section>
+    )}
+  </div>
+</Base>
+
+<style>
+  .home {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 26vw);
+    grid-template-areas:
+      'stage side'
+      'shelf side';
+    grid-template-rows: auto 1fr;
+  }
+  .stage {
+    grid-area: stage;
+    padding: 18px var(--gutter) 0;
+    min-width: 0;
+  }
+  .shelf {
+    grid-area: shelf;
+    padding: 56px var(--gutter) 0;
+    min-width: 0;
+  }
+
+  /* empty state */
+  .lift {
+    width: min(100%, 800px);
+    margin: 40px 0 0 clamp(0px, 3vw, 40px);
+    transform: rotate(-0.8deg);
+  }
+  .top {
+    padding: 34px 40px;
+  }
+  .top__title {
+    font-size: clamp(3rem, 5vw, 4.375rem);
+    color: var(--z0);
+  }
+  .top__lede {
+    max-width: 40em;
+    margin: 16px 0 0;
+    font-size: 1.1875rem;
+    line-height: 1.5;
+    color: var(--z2);
+  }
+  .top__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    padding: 8px 0;
+    color: var(--z1);
+  }
+  .top__more svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .readout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 34px;
+    margin: 18px 0 0 clamp(0px, 3vw, 40px);
+    color: var(--z7);
+  }
+  .readout .n {
+    margin-left: 8px;
+    font-size: 0.875rem;
+    color: var(--z10);
+  }
+
+  /* ── Notes column on the light zone ─────────────────────────────── */
+  .side {
+    grid-area: side;
+    display: flex;
+    flex-direction: column;
+    padding: 44px clamp(24px, 3.4vw, 52px) 48px;
+    background: var(--z9);
+    color: var(--z1);
+  }
+  .side__title {
+    margin-bottom: 22px;
+    font-size: 2.875rem;
+    color: var(--z0);
+  }
+  .side__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 0 6px;
+    border-top: 1px solid var(--z6);
+    color: var(--z1);
+    text-decoration: none;
+  }
+  .side__more svg {
+    width: 15px;
+    height: 15px;
+  }
+  .side__empty {
+    margin: 0;
+    padding-top: 18px;
+    border-top: 1px solid var(--z6);
+    color: var(--z3);
+  }
+  .side__about {
+    margin: 0;
+    padding-top: 48px;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--z2);
+  }
+  .side__about strong {
+    font-weight: 650;
+    color: var(--z0);
+  }
+
+  .shelf__sheet {
+    padding: 34px 40px 40px;
+  }
+  .shelf__title {
+    margin-bottom: 22px;
+    font-size: 2.875rem;
+    color: var(--z0);
+  }
+
+  @media (max-width: 1100px) {
+    .home {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: 'stage' 'shelf' 'side';
+    }
+    .side {
+      margin-top: 56px;
+    }
+    .side__about {
+      max-width: 62ch;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .stage {
+      padding-top: 24px;
+    }
+    .lift {
+      margin: 0;
+      transform: none;
+    }
+    .top,
+    .shelf__sheet {
+      padding: 26px 20px 28px;
+    }
+    .readout {
+      margin-left: 0;
+    }
+    .shelf {
+      padding-top: 40px;
+    }
+  }
+</style>

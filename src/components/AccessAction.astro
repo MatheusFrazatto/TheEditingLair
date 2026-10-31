@@ -1,0 +1,48 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import { withBase } from '../lib/url';
+
+interface Props {
+  plugin: CollectionEntry<'plugins'>;
+}
+
+const { access, title } = Astro.props.plugin.data;
+const isExternal = access.kind === 'free' && /^[a-z]+:\/\//i.test(access.download);
+---
+{access.kind === 'free' ? (
+  <div class="access">
+    <a
+      class="act act--download"
+      href={withBase(access.download)}
+      download={isExternal ? undefined : (access.fileName ?? '')}
+    >
+      <span class="act__main"><Icon name="download" />Download</span>
+      {access.fileSize && <span class="act__seg">{access.fileSize}</span>}
+    </a>
+    <p class="act-note">Free, no sign-up</p>
+  </div>
+) : (
+  <div class="access">
+    <a class="act act--store" href={access.storeUrl} rel="noopener" target="_blank">
+      <span class="act__main"><Icon name="external" />Buy{access.storeName ? ` on ${access.storeName}` : ''}</span>
+      <span class="act__seg">{access.price}</span>
+    </a>
+    <p class="act-note">
+      Sold through {access.storeName ?? 'an external store'}, which handles payment and delivers {title}. Opens in a new tab.
+    </p>
+  </div>
+)}
+
+<style>
+  .access {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+  }
+  .access .act-note {
+    margin: 0;
+    max-width: 34ch;
+  }
+</style>
