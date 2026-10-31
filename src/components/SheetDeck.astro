@@ -226,8 +226,11 @@ const slot = (i: number) => (i < 3 ? String(i) : 'rest');
     display: none;
     padding: 34px 40px;
   }
+  /* laid out at the settled width (set by fitPile), so the text never
+     rewraps — and the sheet never grows taller — while the card widens */
   .card[data-pos='0'] .face--front {
     display: block;
+    width: var(--face-w, auto);
     animation: face-in 480ms var(--ease-out);
   }
   @keyframes face-in {
@@ -676,14 +679,18 @@ const slot = (i: number) => (i < 3 ? String(i) : 'rest');
 
     // ── keep the pile one height, so what sits below never moves on a flip ──
     // Each plugin's sheet has a different length; size the pile to the tallest
-    // one, measured off-screen at the top sheet's width.
+    // one, measured off-screen at the top sheet's settled width. The width comes
+    // from the pile, not the top sheet, which may be mid-transition.
+    const TOP_MAX_WIDTH = 800; // matches .card[data-pos='0'] width: min(100%, 800px)
     const pile = root.querySelector<HTMLElement>('.deck__pile')!;
     function fitPile() {
       const topPaper = cards[order[0]].querySelector<HTMLElement>('.card__paper')!;
+      const faceWidth = Math.min(pile.clientWidth, TOP_MAX_WIDTH) - (topPaper.offsetWidth - topPaper.clientWidth);
+      pile.style.setProperty('--face-w', `${faceWidth}px`);
       const probe = document.createElement('div');
       probe.setAttribute('aria-hidden', 'true');
       probe.inert = true;
-      probe.style.cssText = `position:absolute;left:-10000px;top:0;visibility:hidden;width:${topPaper.clientWidth}px`;
+      probe.style.cssText = `position:absolute;left:-10000px;top:0;visibility:hidden;width:${faceWidth}px`;
       cards.forEach((card) => {
         const face = card.querySelector<HTMLElement>('.face--front')!.cloneNode(true) as HTMLElement;
         face.style.display = 'block';
