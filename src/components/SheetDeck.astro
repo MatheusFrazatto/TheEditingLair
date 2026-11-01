@@ -15,7 +15,9 @@ interface Props {
 
 const plugins = Astro.props.plugins.slice(0, 8);
 const total = plugins.length;
-const slot = (i: number) => (i < 3 ? String(i) : 'rest');
+// Left sheet = next (→), right sheet = previous (←); the rest wait hidden.
+// Keep in sync with slotOf() in the script below.
+const slot = (i: number) => (i === 0 ? '0' : i === 1 ? '1' : i === total - 1 ? '2' : 'rest');
 ---
 <div class="deck" data-deck role="region" aria-roledescription="carousel" aria-label="Plugins on the light table">
   <div class="deck__pile">
@@ -31,7 +33,7 @@ const slot = (i: number) => (i < 3 ? String(i) : 'rest');
           data-title={d.title}
           aria-roledescription="slide"
           aria-label={`${i + 1} of ${total}: ${d.title}`}
-          inert={i >= 3}
+          inert={slot(i) === 'rest'}
         >
           <div class="card__paper">
             {d.cover && (
@@ -558,11 +560,15 @@ const slot = (i: number) => (i < 3 ? String(i) : 'rest');
     const live = root.querySelector<HTMLElement>('[data-live]');
     let order = cards.map((_, i) => i);
 
+    // left sheet is the next one (→), right sheet the previous one (←)
+    const slotOf = (slot: number) =>
+      slot === 0 ? '0' : slot === 1 ? '1' : slot === order.length - 1 ? '2' : 'rest';
+
     function render(announce: boolean) {
       order.forEach((cardIndex, slot) => {
         const card = cards[cardIndex];
-        card.dataset.pos = slot < 3 ? String(slot) : 'rest';
-        card.inert = slot >= 3;
+        card.dataset.pos = slotOf(slot);
+        card.inert = card.dataset.pos === 'rest';
       });
       const top = order[0];
       if (count) count.textContent = `${top + 1} / ${cards.length}`;
@@ -580,7 +586,13 @@ const slot = (i: number) => (i < 3 ? String(i) : 'rest');
       render(true);
     };
     const bring = (cardIndex: number) => {
-      while (order[0] !== cardIndex) order.push(order.shift()!);
+      // turn the pile the short way round, so the right sheet comes back like ←
+      const steps = order.indexOf(cardIndex);
+      if (steps > order.length / 2) {
+        while (order[0] !== cardIndex) order.unshift(order.pop()!);
+      } else {
+        while (order[0] !== cardIndex) order.push(order.shift()!);
+      }
       render(true);
     };
 
