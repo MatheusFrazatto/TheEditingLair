@@ -4,7 +4,7 @@ description: Where a .setting file goes, how to make it show up on both the Fusi
 published: 2026-10-31
 category: tutorial
 tags: [fusion, macros, install]
-relatedPlugins: [easy-crt, easy-ascii, easy-dither]
+relatedPlugins: [easy-crt, easy-ascii, easy-dither, easy-bit]
 ---
 
 Every plugin on this shelf is a Fusion macro: a single `.setting` file. There is no installer. You copy the file into the right folder, restart Resolve, and it shows up in the effects list.
