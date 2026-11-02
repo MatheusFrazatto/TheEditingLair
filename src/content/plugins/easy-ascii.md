@@ -21,7 +21,7 @@ controls:
   - { name: Contrast, default: "1" }
 cover: ./images/easy-ascii.jpg
 coverOriginal: ./images/easy-ascii-original.jpg
-coverBrightness: 1.4
+coverBrightness: 2
 coverAlt: The words EASY ASCII in white dot characters over a dark red ASCII-art silhouette of a cloaked figure.
 tags: [ascii, text, retro, stylize]
 changelog:
