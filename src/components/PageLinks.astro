@@ -1,0 +1,89 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import { withBase } from '../lib/url';
+
+interface Props {
+  plugin: CollectionEntry<'plugins'>;
+}
+
+const { plugin } = Astro.props;
+const d = plugin.data;
+const href = withBase(`plugins/${plugin.id}/`);
+
+// what the plugin's own page holds, each link jumping straight to it
+const links = [
+  d.cover && d.coverOriginal && { href: `${href}#compare`, icon: 'compare' as const, label: 'Before and after' },
+  d.preview && { href: `${href}#preview`, icon: 'play' as const, label: 'Preview loop' },
+  { href: `${href}#controls`, icon: 'arrow' as const, label: 'Controls and install' },
+].filter((link) => !!link);
+---
+<nav class="pagelinks" aria-label={`On the ${d.title} page`}>
+  <ul>
+    {links.map((link) => (
+      <li>
+        <a href={link.href} draggable="false"><Icon name={link.icon} /><span class="ln ln--quiet">{link.label}</span></a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .pagelinks {
+    margin-top: 30px;
+    border-top: 1px solid var(--z8);
+  }
+  .pagelinks ul {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pagelinks li {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-top: 12px;
+  }
+  .pagelinks li + li {
+    padding-left: 20px;
+    border-left: 1px solid var(--z8);
+  }
+  .pagelinks a {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    color: var(--z0);
+    font-size: 1.0625rem;
+    text-decoration: none;
+  }
+  .pagelinks svg {
+    flex: none;
+    width: 15px;
+    height: 15px;
+    color: var(--z2);
+    transition: transform 240ms var(--ease-out), color 240ms var(--ease-out);
+  }
+  .pagelinks a:hover svg,
+  .pagelinks a:focus-visible svg {
+    color: var(--z0);
+    transform: translateX(3px);
+  }
+  /* too narrow for a row: the links stack, still divided by hairlines */
+  @media (max-width: 760px) {
+    .pagelinks ul {
+      flex-direction: column;
+    }
+    .pagelinks li,
+    .pagelinks li + li {
+      padding: 4px 0;
+      border-left: 0;
+    }
+    .pagelinks li + li {
+      border-top: 1px solid var(--z8);
+    }
+    .pagelinks li:first-child {
+      padding-top: 8px;
+    }
+  }
+</style>

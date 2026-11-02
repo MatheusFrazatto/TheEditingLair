@@ -4,6 +4,7 @@ import { Image } from 'astro:assets';
 import PluginFacts from './PluginFacts.astro';
 import AccessAction from './AccessAction.astro';
 import PluginBrief from './PluginBrief.astro';
+import PageLinks from './PageLinks.astro';
 import Icon from './Icon.astro';
 import { pluginTypeLabel } from '../lib/plugin-types';
 import { withBase } from '../lib/url';
@@ -55,7 +56,7 @@ const slot = (i: number) => (i === 0 ? '0' : i === 1 ? '1' : i === total - 1 ? '
                 {d.draft && <span class="draft-tag">Draft</span>}
               </header>
               <p class="top__lede">{d.summary}</p>
-              <div class="top__grid">
+              <div class:list={['top__grid', { 'top__grid--solo': d.features.length === 0 }]}>
                 <div class="top__main">
                   <PluginFacts plugin={p} />
                   <div class="top__act">
@@ -64,6 +65,7 @@ const slot = (i: number) => (i === 0 ? '0' : i === 1 ? '1' : i === total - 1 ? '
                 </div>
                 <PluginBrief plugin={p} />
               </div>
+              <PageLinks plugin={p} />
             </div>
 
             <a class="face face--back" href={href} data-bring draggable="false">
@@ -288,6 +290,9 @@ const slot = (i: number) => (i === 0 ? '0' : i === 1 ? '1' : i === total - 1 ? '
     gap: 36px;
     margin-top: 24px;
     align-items: start;
+  }
+  .top__grid--solo {
+    grid-template-columns: minmax(0, 1fr);
   }
   /* ── Print: a sheet with a photograph, black and white until the pointer
      brings the colour up, the way filtration does on the enlarger ───────── */

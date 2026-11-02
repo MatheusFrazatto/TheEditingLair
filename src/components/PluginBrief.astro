@@ -1,50 +1,23 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import Icon from './Icon.astro';
-import { withBase } from '../lib/url';
 
 interface Props {
   plugin: CollectionEntry<'plugins'>;
 }
 
-const { plugin } = Astro.props;
-const d = plugin.data;
-const href = withBase(`plugins/${plugin.id}/`);
-
-// what the plugin's own page holds, each line jumping straight to it
-const onPage = [
-  d.cover && d.coverOriginal && { href: `${href}#compare`, icon: 'compare' as const, label: 'Before and after' },
-  d.preview && { href: `${href}#preview`, icon: 'play' as const, label: 'Preview loop' },
-  { href: `${href}#controls`, icon: 'arrow' as const, label: 'Controls and install' },
-].filter((item) => !!item);
+const { features } = Astro.props.plugin.data;
 ---
-<div class="brief">
-  {d.features.length > 0 && (
-    <section class="brief__block">
-      <h3 class="legend brief__title">What it does</h3>
-      <ul class="brief__features">
-        {d.features.map((feature) => <li>{feature}</li>)}
-      </ul>
-    </section>
-  )}
-  <section class="brief__block">
-    <h3 class="legend brief__title">On its page</h3>
-    <ul class="brief__links">
-      {onPage.map((item) => (
-        <li>
-          <a href={item.href} draggable="false"><Icon name={item.icon} /><span class="ln ln--quiet">{item.label}</span></a>
-        </li>
-      ))}
+{features.length > 0 && (
+  <section class="brief">
+    <h3 class="legend brief__title">What it does</h3>
+    <ul class="brief__features">
+      {features.map((feature) => <li>{feature}</li>)}
     </ul>
   </section>
-</div>
+)}
 
 <style>
   .brief {
-    display: grid;
-    gap: 26px;
-  }
-  .brief__block {
     padding-top: 10px;
     border-top: 1px solid var(--z0);
   }
@@ -53,8 +26,7 @@ const onPage = [
     font-size: 0.8125rem;
     color: var(--z4);
   }
-  .brief__features,
-  .brief__links {
+  .brief__features {
     margin: 0;
     padding: 0;
     list-style: none;
@@ -79,26 +51,5 @@ const onPage = [
     width: 7px;
     height: 7px;
     background: var(--z0);
-  }
-  .brief__links a {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 7px 0;
-    color: var(--z0);
-    font-size: 1.0625rem;
-    text-decoration: none;
-  }
-  .brief__links svg {
-    flex: none;
-    width: 15px;
-    height: 15px;
-    color: var(--z2);
-    transition: transform 240ms var(--ease-out), color 240ms var(--ease-out);
-  }
-  .brief__links a:hover svg,
-  .brief__links a:focus-visible svg {
-    color: var(--z0);
-    transform: translateX(3px);
   }
 </style>
