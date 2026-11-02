@@ -16,7 +16,7 @@ const widths = [640, 960, 1280, 1920, 2560, 3840].filter((w) => w <= original.wi
 const sizes = '(max-width: 860px) 100vw, 860px';
 const quality = 90;
 ---
-<figure class="compare" data-compare style={`--pos: 50%; --ratio: ${original.width / original.height}`}>
+<figure class="compare" id="compare" data-compare style={`--pos: 50%; --ratio: ${original.width / original.height}`}>
   <div class="compare__frame" data-frame>
     <Image class="compare__img" src={original} alt={`The same frame without ${title}.`} widths={widths} sizes={sizes} quality={quality} />
     <div class="compare__after">

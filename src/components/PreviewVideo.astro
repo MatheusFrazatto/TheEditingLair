@@ -15,7 +15,7 @@ const { title, video, poster, credit } = Astro.props;
 // the poster is the first frame, so the loop starts without a jump
 const posterImg = await getImage({ src: poster, width: Math.min(1600, poster.width), format: 'webp', quality: 82 });
 ---
-<figure class="preview" data-preview style={`--ratio: ${poster.width / poster.height}`}>
+<figure class="preview" id="preview" data-preview style={`--ratio: ${poster.width / poster.height}`}>
   <div class="preview__frame">
     <!-- without JavaScript the browser's own controls stay; the script swaps in the bar -->
     <video

@@ -466,6 +466,11 @@ html[data-intro='play'] *::after {
   animation-play-state: paused !important;
 }
 
+/* a jump to an anchor leaves a little air above it */
+[id] {
+  scroll-margin-top: 24px;
+}
+
 /* ── Links: a filtration line exposes left to right ───────────────── */
 .prose a,
 .side__about a,

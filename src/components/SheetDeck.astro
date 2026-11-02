@@ -3,7 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 import PluginFacts from './PluginFacts.astro';
 import AccessAction from './AccessAction.astro';
-import MacroFigure from './MacroFigure.astro';
+import PluginBrief from './PluginBrief.astro';
 import Icon from './Icon.astro';
 import { pluginTypeLabel } from '../lib/plugin-types';
 import { withBase } from '../lib/url';
@@ -55,17 +55,14 @@ const slot = (i: number) => (i === 0 ? '0' : i === 1 ? '1' : i === total - 1 ? '
                 {d.draft && <span class="draft-tag">Draft</span>}
               </header>
               <p class="top__lede">{d.summary}</p>
-              <div class:list={['top__grid', { 'top__grid--solo': d.controls.length === 0 }]}>
+              <div class="top__grid">
                 <div class="top__main">
                   <PluginFacts plugin={p} />
                   <div class="top__act">
                     <AccessAction plugin={p} />
-                    <a class="top__more" href={href} draggable="false"><span class="ln">Controls and install steps</span><Icon name="arrow" /></a>
                   </div>
                 </div>
-                {d.controls.length > 0 && (
-                  <MacroFigure uid={p.id} title={d.title} typeLabel={pluginTypeLabel[d.type]} controls={d.controls} />
-                )}
+                <PluginBrief plugin={p} />
               </div>
             </div>
 
@@ -89,7 +86,7 @@ const slot = (i: number) => (i === 0 ? '0' : i === 1 ? '1' : i === total - 1 ? '
   {total > 1 && (
     <div class="deck__nav">
       <button class="deck__btn" type="button" data-prev aria-label="Previous plugin"><Icon name="back" /></button>
-      <span class="deck__count n" data-count aria-hidden="true">1 / {total}</span>
+      <span class="deck__count n" data-deck-count aria-hidden="true">1 / {total}</span>
       <button class="deck__btn" type="button" data-next aria-label="Next plugin"><Icon name="arrow" /></button>
       <span class="deck__hint legend">
         <span class="hint--fine">Drag the top sheet to flip through</span>
@@ -292,9 +289,6 @@ const slot = (i: number) => (i === 0 ? '0' : i === 1 ? '1' : i === total - 1 ? '
     margin-top: 24px;
     align-items: start;
   }
-  .top__grid--solo {
-    grid-template-columns: minmax(0, 1fr);
-  }
   /* ── Print: a sheet with a photograph, black and white until the pointer
      brings the colour up, the way filtration does on the enlarger ───────── */
   .print {
@@ -366,28 +360,12 @@ const slot = (i: number) => (i === 0 ? '0' : i === 1 ? '1' : i === total - 1 ? '
   .card--print .face--front :global(.act--download) {
     color: #f2f2f2;
   }
-  .card--print .face--front :global(.mfig__node) {
-    fill: #0d0d0d;
-  }
   .top__act {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 14px 28px;
     margin-top: 26px;
-  }
-  .top__more {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 0;
-    color: var(--z1);
-    font-size: 1.0625rem;
-  }
-  .top__more svg {
-    width: 16px;
-    height: 16px;
-    transition: transform 240ms var(--ease-out);
   }
 
   .back__row {
@@ -557,7 +535,7 @@ const slot = (i: number) => (i === 0 ? '0' : i === 1 ? '1' : i === total - 1 ? '
     const cards = Array.from(root.querySelectorAll<HTMLElement>('[data-card]'));
     if (cards.length < 2) return;
 
-    const count = root.querySelector<HTMLElement>('[data-count]');
+    const count = root.querySelector<HTMLElement>('[data-deck-count]');
     const live = root.querySelector<HTMLElement>('[data-live]');
     let order = cards.map((_, i) => i);
 

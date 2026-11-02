@@ -13,12 +13,11 @@ access:
   download: https://github.com/MatheusFrazatto/TheEditingLair/releases/download/easy-crt-v2.2.0/Easy-CRT-v2.2.0.zip
   fileName: Easy-CRT-v2.2.0.zip
   fileSize: 4 KB
-controls:
-  - { name: Curvature, default: "-0.4" }
-  - { name: Mask Size, default: "1" }
-  - { name: Glow Amount, default: "0.25" }
-  - { name: Bloom Amount, default: "1" }
-  - { name: Frame Repeat, default: "2" }
+features:
+  - Curved tube and RGB phosphor mask
+  - Glow, bloom and halation
+  - Grain and color fringing
+  - A flickering signal
 cover: ./images/easy-crt.jpg
 coverOriginal: ./images/easy-crt-original.jpg
 coverBrightness: 0.8

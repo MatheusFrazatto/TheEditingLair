@@ -13,12 +13,11 @@ access:
   download: https://github.com/MatheusFrazatto/TheEditingLair/releases/download/easy-bit-v2.0.0/Easy-Bit-v2.0.0.zip
   fileName: Easy-Bit-v2.0.0.zip
   fileSize: 8 KB
-controls:
-  - { name: Pixel Size, default: "6" }
-  - { name: Texture, default: "Clean" }
-  - { name: Palette, default: "None" }
-  - { name: Pixel Grid, default: "Off" }
-  - { name: Frame Repeat, default: "2" }
+features:
+  - Crisp blocks at 1080p and 4K
+  - 4-color palettes from Lospec
+  - Pixel grid and RGB shift
+  - The choppy motion of old games
 cover: ./images/easy-bit.jpg
 coverOriginal: ./images/easy-bit-original.jpg
 coverBrightness: 1

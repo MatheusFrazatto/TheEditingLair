@@ -49,8 +49,8 @@ const plugins = defineCollection({
         os: z.array(z.enum(['windows', 'macos', 'linux'])).default(['windows', 'macos', 'linux']),
       }),
       access,
-      /** Exposed controls and their defaults; drawn as the annotated figure on the home sheet. */
-      controls: z.array(z.object({ name: z.string(), default: z.string() })).default([]),
+      /** A few short lines on what the effect does, listed on the home sheet. */
+      features: z.array(z.string().max(40)).max(5).default([]),
       cover: image().optional(),
       /** The same frame without the effect; turns the cover on the plugin page into a before/after comparison. */
       coverOriginal: image().optional(),

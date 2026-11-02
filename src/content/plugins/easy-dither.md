@@ -13,12 +13,11 @@ access:
   download: https://github.com/MatheusFrazatto/TheEditingLair/releases/download/easy-dither-v1.1.0/Easy-Dither-v1.1.0.zip
   fileName: Easy-Dither-v1.1.0.zip
   fileSize: 5 KB
-controls:
-  - { name: Dither Size, default: "5" }
-  - { name: Pattern, default: "Bayer 2x2" }
-  - { name: Dither Strength, default: "1" }
-  - { name: Posterize Steps, default: "3" }
-  - { name: Color Mode, default: "Original" }
+features:
+  - Six ordered dither patterns
+  - Original or posterized color
+  - Twelve duotone presets
+  - A clean grid at 1080p and 4K
 cover: ./images/easy-dither.jpg
 coverOriginal: ./images/easy-dither-original.jpg
 coverBrightness: 1.2

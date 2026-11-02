@@ -49,7 +49,7 @@ There is no UI framework and no client-side router. Pages are plain HTML and CSS
 
 ## Engineering highlights
 
-**Content is data.** A plugin is one Markdown file. Its frontmatter is checked against a schema at build time: version, Resolve version, edition, OS list, exposed controls, cover image, changelog. A typo fails the build instead of shipping a broken page. Access is a discriminated union: a free plugin points to a file, while a paid one must point to an external store, so the site can never host a paid file or handle payments.
+**Content is data.** A plugin is one Markdown file. Its frontmatter is checked against a schema at build time: version, Resolve version, edition, OS list, a short feature list, cover image, changelog. A typo fails the build instead of shipping a broken page. Access is a discriminated union: a free plugin points to a file, while a paid one must point to an external store, so the site can never host a paid file or handle payments.
 
 **Works under a sub-path.** GitHub Pages serves the site from `/TheEditingLair/`. The workflow reads the origin and base path from `actions/configure-pages` and passes them to Astro, and every internal link goes through one `withBase()` helper. The same build also works at a domain root.
 

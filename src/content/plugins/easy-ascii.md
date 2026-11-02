@@ -13,12 +13,11 @@ access:
   download: https://github.com/MatheusFrazatto/TheEditingLair/releases/download/easy-ascii-v2.1.0/Easy-ASCII-v2.1.0.zip
   fileName: Easy-ASCII-v2.1.0.zip
   fileSize: 7 KB
-controls:
-  - { name: Density, default: "150" }
-  - { name: Character Set, default: "Classic" }
-  - { name: Palette, default: "Custom" }
-  - { name: Glyph Size, default: "1.5" }
-  - { name: Contrast, default: "1" }
+features:
+  - 13 character sets, or your own
+  - 15 color palettes
+  - Works on footage, titles and graphics
+  - Updates every frame
 cover: ./images/easy-ascii.jpg
 coverOriginal: ./images/easy-ascii-original.jpg
 coverBrightness: 2
