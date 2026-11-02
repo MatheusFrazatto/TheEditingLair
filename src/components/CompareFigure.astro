@@ -10,14 +10,17 @@ interface Props {
 }
 
 const { title, effect, original, alt } = Astro.props;
-const widths = [640, 960, 1280, 1920];
+// up to the source width, so full screen on a 4K or high-density display gets a sharp file;
+// quality is raised because dither and character textures smear under heavy compression
+const widths = [640, 960, 1280, 1920, 2560, 3840].filter((w) => w <= original.width);
 const sizes = '(max-width: 860px) 100vw, 860px';
+const quality = 90;
 ---
 <figure class="compare" data-compare style={`--pos: 50%; --ratio: ${original.width / original.height}`}>
   <div class="compare__frame" data-frame>
-    <Image class="compare__img" src={original} alt={`The same frame without ${title}.`} widths={widths} sizes={sizes} />
+    <Image class="compare__img" src={original} alt={`The same frame without ${title}.`} widths={widths} sizes={sizes} quality={quality} />
     <div class="compare__after">
-      <Image class="compare__img" src={effect} alt={alt ?? ''} widths={widths} sizes={sizes} />
+      <Image class="compare__img" src={effect} alt={alt ?? ''} widths={widths} sizes={sizes} quality={quality} />
     </div>
     <span class="compare__tag compare__tag--before" aria-hidden="true">Original</span>
     <span class="compare__tag compare__tag--after" aria-hidden="true">{title}</span>
@@ -311,7 +314,12 @@ const sizes = '(max-width: 860px) 100vw, 860px';
     // a fixed layer inside it, so the fallback lifts the figure to <body>.
     let spot: Comment | null = null;
 
+    // full screen fills the viewport, so let the browser pick a file for that
+    // width; kept afterwards, since the larger file is already loaded by then
+    const images = Array.from(root.querySelectorAll<HTMLImageElement>('.compare__img'));
+
     function setFull(on: boolean) {
+      if (on) images.forEach((img) => (img.sizes = '100vw'));
       root.classList.toggle('is-full', on);
       document.documentElement.classList.toggle('compare-open', on);
       full.setAttribute('aria-pressed', String(on));
