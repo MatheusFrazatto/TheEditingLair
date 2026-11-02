@@ -1,10 +1,10 @@
 {
   "title": "Easy Complete",
-  "version": 1,
+  "version": 2,
   "released": "2026-11-02",
-  "download": "https://github.com/MatheusFrazatto/TheEditingLair/releases/download/easy-complete-v1/Easy-Complete-v1.zip",
-  "fileName": "Easy-Complete-v1.zip",
-  "fileSize": "23 KB",
+  "download": "https://github.com/MatheusFrazatto/TheEditingLair/releases/download/easy-complete-v2/Easy-Complete-v2.zip",
+  "fileName": "Easy-Complete-v2.zip",
+  "fileSize": "25 KB",
   "studio": [
     "Easy CRT"
   ],
@@ -17,7 +17,7 @@
     {
       "id": "easy-bit",
       "title": "Easy Bit",
-      "version": "1.0.0"
+      "version": "2.0.0"
     },
     {
       "id": "easy-crt",
