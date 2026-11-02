@@ -20,6 +20,7 @@ controls:
   - { name: Bloom Amount, default: "1" }
   - { name: Frame Repeat, default: "2" }
 cover: ./images/easy-crt.jpg
+coverOriginal: ./images/easy-crt-original.jpg
 coverBrightness: 2.6
 coverAlt: The words EASY CRT in red over a red wireframe globe on a black screen.
 tags: [crt, retro, screen, glow]

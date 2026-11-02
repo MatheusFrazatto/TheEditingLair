@@ -5,6 +5,7 @@ import Base from '../../layouts/Base.astro';
 import PluginFacts from '../../components/PluginFacts.astro';
 import AccessAction from '../../components/AccessAction.astro';
 import NoteList from '../../components/NoteList.astro';
+import CompareFigure from '../../components/CompareFigure.astro';
 import Icon from '../../components/Icon.astro';
 import { getPlugins, getPosts } from '../../lib/content';
 import { pluginTypeLabel } from '../../lib/plugin-types';
@@ -53,7 +54,10 @@ const others = (await getPlugins()).filter((p) => p.id !== plugin.id).slice(0, 3
           </div>
         </div>
 
-        {d.cover && (
+        {d.cover && d.coverOriginal && (
+          <CompareFigure title={d.title} effect={d.cover} original={d.coverOriginal} alt={d.coverAlt} />
+        )}
+        {d.cover && !d.coverOriginal && (
           <figure class="doc__figure" style={`--print-lift: ${d.coverBrightness}`}>
             <Image src={d.cover} alt={d.coverAlt ?? ''} widths={[640, 960, 1280]} sizes="(max-width: 860px) 100vw, 860px" />
           </figure>

@@ -19,6 +19,7 @@ controls:
   - { name: Color Steps, default: "3" }
   - { name: Frame Repeat, default: "5" }
 cover: ./images/easy-bit.jpg
+coverOriginal: ./images/easy-bit-original.jpg
 coverBrightness: 1.4
 coverAlt: The words EASY BIT in white over a pixel-art raccoon mask in dark blue, on a black background.
 tags: [pixel, 8-bit, retro, palette]

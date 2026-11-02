@@ -20,6 +20,7 @@ controls:
   - { name: Posterize Steps, default: "3" }
   - { name: Color Mode, default: "Original" }
 cover: ./images/easy-dither.jpg
+coverOriginal: ./images/easy-dither-original.jpg
 coverBrightness: 1.4
 coverAlt: The words EASY DITHER in blue over a dithered, dimly lit figure wearing a spiked crown, on a black background.
 tags: [dither, retro, pixel, duotone]

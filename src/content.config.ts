@@ -52,6 +52,8 @@ const plugins = defineCollection({
       /** Exposed controls and their defaults; drawn as the annotated figure on the home sheet. */
       controls: z.array(z.object({ name: z.string(), default: z.string() })).default([]),
       cover: image().optional(),
+      /** The same frame without the effect; turns the cover on the plugin page into a before/after comparison. */
+      coverOriginal: image().optional(),
       coverAlt: z.string().optional(),
       /** Brightness of the black-and-white cover at rest; raise it for dark images (e.g. 2 for a red-on-black frame). */
       coverBrightness: z.number().min(0.5).max(3).default(1),

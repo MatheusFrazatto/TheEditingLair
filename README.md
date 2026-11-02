@@ -60,6 +60,8 @@ There is no UI framework and no client-side router. Pages are plain HTML and CSS
 
 **Motion that respects the reader.** A short intro plays once per session, can be skipped with any key or click, and has failsafe timeouts so the page can never get stuck behind it. Everything honors `prefers-reduced-motion`. The cover images sit in black and white and develop into color on hover or keyboard focus.
 
+**Before and after, on every plugin page.** The cover is a comparison of the same frame with and without the effect, split by a divider you drag with a mouse or finger, or move with the arrow, Page and Home/End keys. It is an ARIA slider that reports how much of the original is showing, the vertical page scroll still works on touch screens, and a single sweep of the divider hints that it moves the first time it comes into view (skipped with reduced motion or once you touch it).
+
 **Downloads stay byte-identical.** `.gitattributes` marks `public/downloads/**` as binary, so line-ending conversion can never change a macro between my Resolve folder and the visitor's download.
 
 **Accessibility basics.** Skip link, visible focus states, semantic landmarks, ARIA table roles on the plugin table, and alt text on every cover.
@@ -107,8 +109,9 @@ SITE_URL=https://matheusfrazatto.github.io BASE_PATH=/TheEditingLair npm run bui
 
 1. Put the `.setting` file in `public/downloads/<slug>/`.
 2. Add a cover image to `src/content/plugins/images/`.
-3. Create `src/content/plugins/<slug>.md` with the frontmatter (the schema in `src/content.config.ts` lists every field) and write the page body.
-4. Run `npm run check`, then push to `main`. GitHub Actions builds and deploys the site.
+3. Optionally add the same frame without the effect as `<slug>-original.jpg` and point `coverOriginal` at it to get the before/after comparison.
+4. Create `src/content/plugins/<slug>.md` with the frontmatter (the schema in `src/content.config.ts` lists every field) and write the page body.
+5. Run `npm run check`, then push to `main`. GitHub Actions builds and deploys the site.
 
 Setting `draft: true` keeps a plugin or note visible in the dev server only.
 
