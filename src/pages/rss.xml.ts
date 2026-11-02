@@ -8,7 +8,7 @@ export async function GET(context: APIContext) {
   return rss({
     title: 'The Editing Lair: Notes',
     description: 'Editing curiosities, tools worth knowing and short DaVinci Resolve tutorials.',
-    site: context.site!,
+    site: new URL(withBase(''), context.site).href,
     items: posts.map((post) => ({
       title: post.data.title,
       description: post.data.description,

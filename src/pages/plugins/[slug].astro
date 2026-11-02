@@ -12,7 +12,8 @@ import { getPlugins, getPosts } from '../../lib/content';
 import { pluginTypeLabel } from '../../lib/plugin-types';
 import { isoDate } from '../../lib/format';
 import { withBase } from '../../lib/url';
-import { reportUrl } from '../../lib/site';
+import { repoUrl, reportUrl } from '../../lib/site';
+import { pluginSchema } from '../../lib/schema';
 
 export async function getStaticPaths() {
   const plugins = await getPlugins();
@@ -37,7 +38,13 @@ const shareImage =
     ? { src: share.src, width: 1200, height: Math.round((1200 * d.cover.height) / d.cover.width), alt: d.coverAlt }
     : undefined;
 ---
-<Base title={d.title} description={d.summary} current="plugins" image={shareImage}>
+<Base
+  title={d.title}
+  description={d.summary}
+  current="plugins"
+  image={shareImage}
+  jsonLd={pluginSchema(plugin, Astro.site!, shareImage?.src)}
+>
   <div class="page">
     <div class="sheet-wrap main-sheet">
       <article class="sheet doc">
@@ -91,13 +98,17 @@ const shareImage =
             <h2 class="log__title" id="log-heading">Changelog</h2>
             <ol class="log__list">
               {d.changelog.map((entry, i) => (
-                <li class:list={{ current: i === 0 }}>
+                <li class:list={{ current: i === 0 }} id={`v${entry.version}`}>
                   <span class="n log__ver">{entry.version}</span>
                   <time class="n log__date" datetime={entry.date.toISOString()}>{isoDate(entry.date)}</time>
                   <span class="log__notes">{entry.notes}</span>
                 </li>
               ))}
             </ol>
+            <p class="log__follow">
+              Follow new versions through the <a href={withBase('plugins.xml')}><span class="ln">plugin updates feed</span></a>,
+              or on <a href={repoUrl} rel="noopener"><span class="ln">GitHub</span></a> with Watch, Custom, Releases.
+            </p>
           </section>
         )}
       </article>
@@ -127,6 +138,9 @@ const shareImage =
       )}
       <div class="rail__links">
         <a class="rail__back legend" href={withBase('plugins/')}><Icon name="back" /><span class="ln ln--quiet">All plugins</span></a>
+        {d.access.kind === 'free' && (
+          <a class="rail__back legend" href={withBase('plugins/#easy-complete')}><Icon name="download" /><span class="ln ln--quiet">Every plugin in one zip</span></a>
+        )}
         <a class="rail__back legend" href={reportUrl({ title: d.title, version: d.version })} rel="noopener"><Icon name="external" /><span class="ln ln--quiet">Report a problem</span></a>
       </div>
     </aside>
@@ -277,6 +291,17 @@ const shareImage =
     font-size: 0.875rem;
     color: var(--z4);
     padding-top: 2px;
+  }
+  .log__follow {
+    margin: 10px 0 0;
+    font: 500 0.9375rem/1.5 var(--f-legend);
+    letter-spacing: 0.01em;
+    color: var(--z3);
+    text-wrap: pretty;
+  }
+  .log__follow a {
+    color: var(--z0);
+    text-decoration: none;
   }
 
   /* ── Rail on the dark ground ─────────────────────────────────────── */

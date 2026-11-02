@@ -7,6 +7,7 @@ import Icon from '../components/Icon.astro';
 import { getPlugins, getPosts } from '../lib/content';
 import { resolveFloor } from '../lib/format';
 import { withBase } from '../lib/url';
+import { websiteSchema } from '../lib/schema';
 
 const plugins = await getPlugins();
 const posts = await getPosts();
@@ -20,7 +21,7 @@ const paidCount = plugins.length - freeCount;
 const floors = plugins.map((p) => resolveFloor(p.data.compatibility.resolve)).filter((n) => !Number.isNaN(n));
 const oldestResolve = floors.length ? Math.min(...floors).toFixed(1) : null;
 ---
-<Base wedge="full">
+<Base wedge="full" jsonLd={websiteSchema(Astro.site!)}>
   <div class="home">
     <section class="stage" aria-label="Plugins">
       {featured ? (

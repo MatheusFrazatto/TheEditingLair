@@ -21,6 +21,8 @@ interface Props {
   current?: 'plugins' | 'notes' | 'about';
   /** The picture a shared link shows; the site card when left out. */
   image?: ShareImage;
+  /** schema.org data describing the page for search engines. */
+  jsonLd?: Record<string, unknown>;
 }
 
 const {
@@ -50,6 +52,7 @@ const share: ShareImage = Astro.props.image ?? {
     <link rel="canonical" href={canonical} />
     <link rel="icon" href={withBase('favicon.svg')} type="image/svg+xml" />
     <link rel="alternate" type="application/rss+xml" title="The Editing Lair: Notes" href={withBase('rss.xml')} />
+    <link rel="alternate" type="application/rss+xml" title="The Editing Lair: Plugin updates" href={withBase('plugins.xml')} />
     <link rel="sitemap" href={withBase('sitemap-index.xml')} />
     <meta name="theme-color" content="#1a1a1a" />
     <meta property="og:type" content="website" />
@@ -62,6 +65,9 @@ const share: ShareImage = Astro.props.image ?? {
     <meta property="og:image:height" content={String(share.height)} />
     {share.alt && <meta property="og:image:alt" content={share.alt} />}
     <meta name="twitter:card" content="summary_large_image" />
+    {Astro.props.jsonLd && (
+      <script type="application/ld+json" set:html={JSON.stringify(Astro.props.jsonLd).replace(/</g, '\\u003c')} />
+    )}
     <script is:inline>
       // Decide before first paint: hold the home entrance for motion.ts, and
       // play the intro once per session. Both release on their own if the

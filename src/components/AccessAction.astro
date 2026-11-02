@@ -1,8 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import Icon from './Icon.astro';
-import { withBase } from '../lib/url';
-import { isReleaseDownload } from '../lib/site';
+import DownloadAction from './DownloadAction.astro';
 
 interface Props {
   plugin: CollectionEntry<'plugins'>;
@@ -10,26 +9,9 @@ interface Props {
 
 const { id } = Astro.props.plugin;
 const { access, title } = Astro.props.plugin.data;
-const isExternal = access.kind === 'free' && /^[a-z]+:\/\//i.test(access.download);
-// release downloads are counted by GitHub; the script fills in the total
-const counted = access.kind === 'free' && isReleaseDownload(access.download);
 ---
 {access.kind === 'free' ? (
-  <div class="access">
-    <a
-      class="act act--download"
-      href={withBase(access.download)}
-      download={isExternal ? undefined : (access.fileName ?? '')}
-    >
-      <span class="act__main"><Icon name="download" />Download</span>
-      {access.fileSize && <span class="act__seg">{access.fileSize}</span>}
-    </a>
-    <p class="act-note">
-      Free, no sign-up{counted && (
-        <span data-downloads={id} hidden> · <span class="n" data-count></span> <span data-unit>downloads</span></span>
-      )}
-    </p>
-  </div>
+  <DownloadAction href={access.download} fileName={access.fileName} fileSize={access.fileSize} countId={id} />
 ) : (
   <div class="access">
     <a class="act act--store" href={access.storeUrl} rel="noopener" target="_blank">
@@ -53,57 +35,4 @@ const counted = access.kind === 'free' && isReleaseDownload(access.download);
     margin: 0;
     max-width: 34ch;
   }
-  .access .act-note .n {
-    font-size: 0.875em;
-  }
 </style>
-
-<script>
-  import { repo } from '../lib/site';
-
-  const CACHE_KEY = 'tel-downloads';
-  const CACHE_MS = 10 * 60 * 1000;
-
-  // Totals per plugin across every version, from the public Releases API.
-  // Cached for the session so browsing the shelf stays well inside GitHub's
-  // limit of 60 unauthenticated requests an hour.
-  async function downloadCounts(): Promise<Record<string, number>> {
-    try {
-      const cached = JSON.parse(sessionStorage.getItem(CACHE_KEY) ?? 'null');
-      if (cached && Date.now() - cached.at < CACHE_MS) return cached.counts;
-    } catch {}
-
-    const res = await fetch(`https://api.github.com/repos/${repo}/releases?per_page=100`, {
-      headers: { Accept: 'application/vnd.github+json' },
-    });
-    if (!res.ok) throw new Error(`GitHub answered ${res.status}`);
-    const releases: { tag_name: string; assets: { download_count: number }[] }[] = await res.json();
-
-    const counts: Record<string, number> = {};
-    for (const release of releases) {
-      const slug = /^(.+)-v\d/.exec(release.tag_name)?.[1];
-      if (!slug) continue;
-      counts[slug] = (counts[slug] ?? 0) + release.assets.reduce((n, a) => n + a.download_count, 0);
-    }
-    try {
-      sessionStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), counts }));
-    } catch {}
-    return counts;
-  }
-
-  const notes = document.querySelectorAll<HTMLElement>('[data-downloads]');
-  if (notes.length) {
-    downloadCounts()
-      .then((counts) => {
-        notes.forEach((note) => {
-          const n = counts[note.dataset.downloads!];
-          if (!n) return;
-          note.querySelector('[data-count]')!.textContent = n.toLocaleString('en-US');
-          note.querySelector('[data-unit]')!.textContent = n === 1 ? 'download' : 'downloads';
-          note.hidden = false;
-        });
-      })
-      // without the count the note simply stays as it was
-      .catch(() => {});
-  }
-</script>

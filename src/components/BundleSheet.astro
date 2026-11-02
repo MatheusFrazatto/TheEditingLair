@@ -1,0 +1,104 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import DownloadAction from './DownloadAction.astro';
+import bundle from '../data/easy-complete.json';
+import { withBase } from '../lib/url';
+
+interface Props {
+  /** The published plugins, to check the bundle against. */
+  plugins: CollectionEntry<'plugins'>[];
+}
+
+const { plugins } = Astro.props;
+
+// The bundle is rebuilt by `npm run release`; say so in the build log when a
+// plugin has moved on since, so a stale zip never ships unnoticed.
+const stale = plugins.filter(
+  (p) => p.data.access.kind === 'free' && bundle.contents.find((c) => c.id === p.id)?.version !== p.data.version,
+);
+if (stale.length) {
+  console.warn(
+    `[easy-complete] out of date for ${stale.map((p) => `${p.data.title} ${p.data.version}`).join(', ')}; run npm run release -- easy-complete`,
+  );
+}
+
+const studio = bundle.studio;
+const studioNote =
+  studio.length === 0
+    ? 'Every one runs on Resolve Free.'
+    : `${studio.join(' and ')} ${studio.length === 1 ? 'needs' : 'need'} Resolve Studio; the rest run on Resolve Free.`;
+---
+<section class="bundle sheet" id="easy-complete" aria-labelledby="bundle-title">
+  <div class="bundle__text">
+    <h2 class="display bundle__title" id="bundle-title">{bundle.title}</h2>
+    <p class="bundle__lede">Every plugin on the shelf in one zip, at its current version.</p>
+    <ul class="bundle__list">
+      {bundle.contents.map((c) => (
+        <li>
+          <a href={withBase(`plugins/${c.id}/`)}><span class="ln ln--quiet">{c.title}</span></a>
+          <span class="n">{c.version}</span>
+        </li>
+      ))}
+    </ul>
+    <p class="bundle__note">{studioNote}</p>
+  </div>
+  <div class="bundle__get">
+    <DownloadAction href={bundle.download} fileName={bundle.fileName} fileSize={bundle.fileSize} countId="easy-complete" />
+  </div>
+</section>
+
+<style>
+  .bundle {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 28px 56px;
+    align-items: center;
+    margin-top: 40px;
+    padding: 30px clamp(20px, 3vw, 40px) 34px;
+  }
+  .bundle__title {
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    color: var(--z0);
+  }
+  .bundle__lede {
+    margin: 10px 0 0;
+    font-size: 1.1875rem;
+    line-height: 1.45;
+    color: var(--z2);
+  }
+  .bundle__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 28px;
+    margin: 18px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .bundle__list li {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .bundle__list a {
+    font: 600 0.9375rem/1.2 var(--f-legend);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--z0);
+    text-decoration: none;
+  }
+  .bundle__list .n {
+    font-size: 0.875rem;
+    color: var(--z3);
+  }
+  .bundle__note {
+    margin: 14px 0 0;
+    font: 500 0.9375rem/1.5 var(--f-legend);
+    letter-spacing: 0.01em;
+    color: var(--z4);
+  }
+  @media (max-width: 760px) {
+    .bundle {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

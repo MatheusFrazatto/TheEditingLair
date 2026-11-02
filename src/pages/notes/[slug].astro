@@ -7,6 +7,7 @@ import Icon from '../../components/Icon.astro';
 import { getPlugins, getPosts } from '../../lib/content';
 import { categoryLabel, isoDate, readingMinutes } from '../../lib/format';
 import { withBase } from '../../lib/url';
+import { noteSchema } from '../../lib/schema';
 
 export async function getStaticPaths() {
   const posts = await getPosts();
@@ -28,7 +29,7 @@ const d = post.data;
 const { Content } = await render(post);
 const related = (await getPlugins()).filter((p) => d.relatedPlugins.includes(p.id));
 ---
-<Base title={d.title} description={d.description} current="notes">
+<Base title={d.title} description={d.description} current="notes" jsonLd={noteSchema(post, Astro.site!)}>
   <div class="page">
     <div class="sheet-wrap main-sheet">
       <article class="sheet doc">

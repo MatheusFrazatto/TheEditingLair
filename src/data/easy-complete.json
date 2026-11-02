@@ -1,0 +1,33 @@
+{
+  "title": "Easy Complete",
+  "version": 1,
+  "released": "2026-11-02",
+  "download": "https://github.com/MatheusFrazatto/TheEditingLair/releases/download/easy-complete-v1/Easy-Complete-v1.zip",
+  "fileName": "Easy-Complete-v1.zip",
+  "fileSize": "23 KB",
+  "studio": [
+    "Easy CRT"
+  ],
+  "contents": [
+    {
+      "id": "easy-ascii",
+      "title": "Easy ASCII",
+      "version": "2.1.0"
+    },
+    {
+      "id": "easy-bit",
+      "title": "Easy Bit",
+      "version": "1.0.0"
+    },
+    {
+      "id": "easy-crt",
+      "title": "Easy CRT",
+      "version": "2.2.0"
+    },
+    {
+      "id": "easy-dither",
+      "title": "Easy Dither",
+      "version": "1.1.0"
+    }
+  ]
+}

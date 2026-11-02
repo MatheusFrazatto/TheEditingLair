@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import PluginTable from '../../components/PluginTable.astro';
+import BundleSheet from '../../components/BundleSheet.astro';
 import { getPlugins } from '../../lib/content';
 
 const plugins = await getPlugins();
@@ -24,6 +25,12 @@ const plugins = await getPlugins();
         )}
       </div>
     </div>
+
+    {plugins.length > 1 && (
+      <div class="sheet-wrap">
+        <BundleSheet plugins={plugins} />
+      </div>
+    )}
   </div>
 </Base>
 

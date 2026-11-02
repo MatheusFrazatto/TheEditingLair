@@ -66,11 +66,13 @@ There is no UI framework and no client-side router. Pages are plain HTML and CSS
 
 **Previews that play only when seen.** Each plugin page has a short silent loop of the effect. The video loads nothing until it scrolls into view, plays while at least half of it is on screen and pauses when it leaves. A visitor's pause, or `prefers-reduced-motion`, keeps it still until they press play. The poster is the first frame, so the loop starts without a jump, and without JavaScript the browser's own controls remain.
 
+**Found and followed.** Plugin pages describe themselves to search engines as schema.org `SoftwareApplication` data (version, requirements, free offer, download), notes as `BlogPosting`. A second RSS feed carries one item per plugin release, linked to its changelog entry, so people can follow new versions.
+
 **Links that preview well.** Every page carries Open Graph and Twitter card tags. A plugin page shares its cover, resized at build time; other pages share a site card in the same step-wedge look.
 
 **Issue forms instead of a contact form.** There is no backend, so problems and requests go to GitHub Issues through forms. The "Report a problem" link on each plugin page pre-fills the plugin and its version.
 
-**Counted downloads without a backend.** Each plugin version is a GitHub Release, and the Download button points at its asset, so GitHub counts every download. The plugin page asks the public Releases API for the total across all versions, caches it for the session, and leaves the note as it was if GitHub does not answer. Release assets cannot keep spaces in their names, and Resolve shows the file name as the effect name, so `npm run release` ships each macro inside a zip it writes itself (no dependency), under its exact name, byte for byte. It creates the release from the changelog and points the page at it.
+**Counted downloads without a backend.** Each plugin version is a GitHub Release, and the Download button points at its asset, so GitHub counts every download. The plugin page asks the public Releases API for the total across all versions, caches it for the session, and leaves the note as it was if GitHub does not answer. Release assets cannot keep spaces in their names, and Resolve shows the file name as the effect name, so `npm run release` ships each macro inside a zip it writes itself (no dependency), under its exact name, byte for byte. It creates the release from the changelog and points the page at it, then rebuilds Easy Complete, a zip of every free plugin, as its own counted release, so the bundle never falls behind; the build log warns if it ever does.
 
 **Downloads stay byte-identical.** `.gitattributes` marks `public/downloads/**` as binary, so line-ending conversion can never change a macro between my Resolve folder and the zip.
 
@@ -125,7 +127,7 @@ SITE_URL=https://matheusfrazatto.github.io BASE_PATH=/TheEditingLair npm run bui
 3. Optionally add the same frame without the effect as `<slug>-original.jpg` and point `coverOriginal` at it to get the before/after comparison.
 4. Optionally add a short silent loop as `public/media/<slug>/preview.mp4`, with its first frame as `<slug>-preview.jpg`, and point `preview` at both.
 5. Create `src/content/plugins/<slug>.md` with the frontmatter (the schema in `src/content.config.ts` lists every field) and write the page body.
-6. Run `npm run release -- <slug>`. It zips the `.setting`, creates the GitHub Release `<slug>-v<version>` with the changelog notes, and updates the download, file name and size on the page.
+6. Run `npm run release -- <slug>`. It zips the `.setting`, creates the GitHub Release `<slug>-v<version>` with the changelog notes, and updates the download, file name and size on the page. It then rebuilds Easy Complete (`src/data/easy-complete.json`); pass `--no-bundle` to skip that.
 7. Run `npm run check`, then push to `main`. GitHub Actions builds and deploys the site.
 
 Setting `draft: true` keeps a plugin or note visible in the dev server only.

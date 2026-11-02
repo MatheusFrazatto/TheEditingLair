@@ -1,0 +1,96 @@
+---
+import Icon from './Icon.astro';
+import { withBase } from '../lib/url';
+import { isReleaseDownload } from '../lib/site';
+
+interface Props {
+  /** Path under /public or a full URL. */
+  href: string;
+  fileName?: string;
+  fileSize?: string;
+  /** Release tag prefix whose downloads GitHub counts, e.g. "easy-crt". */
+  countId: string;
+}
+
+const { href, fileName, fileSize, countId } = Astro.props;
+const isExternal = /^[a-z]+:\/\//i.test(href);
+// release downloads are counted by GitHub; the script fills in the total
+const counted = isReleaseDownload(href);
+---
+<div class="access">
+  <a class="act act--download" href={withBase(href)} download={isExternal ? undefined : (fileName ?? '')}>
+    <span class="act__main"><Icon name="download" />Download</span>
+    {fileSize && <span class="act__seg">{fileSize}</span>}
+  </a>
+  <p class="act-note">
+    Free, no sign-up{counted && (
+      <span data-downloads={countId} hidden> · <span class="n" data-count></span> <span data-unit>downloads</span></span>
+    )}
+  </p>
+</div>
+
+<style>
+  .access {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+  }
+  .access .act-note {
+    margin: 0;
+    max-width: 34ch;
+  }
+  .access .act-note .n {
+    font-size: 0.875em;
+  }
+</style>
+
+<script>
+  import { repo } from '../lib/site';
+
+  const CACHE_KEY = 'tel-downloads';
+  const CACHE_MS = 10 * 60 * 1000;
+
+  // Totals per plugin across every version, from the public Releases API.
+  // Cached for the session so browsing the shelf stays well inside GitHub's
+  // limit of 60 unauthenticated requests an hour.
+  async function downloadCounts(): Promise<Record<string, number>> {
+    try {
+      const cached = JSON.parse(sessionStorage.getItem(CACHE_KEY) ?? 'null');
+      if (cached && Date.now() - cached.at < CACHE_MS) return cached.counts;
+    } catch {}
+
+    const res = await fetch(`https://api.github.com/repos/${repo}/releases?per_page=100`, {
+      headers: { Accept: 'application/vnd.github+json' },
+    });
+    if (!res.ok) throw new Error(`GitHub answered ${res.status}`);
+    const releases: { tag_name: string; assets: { download_count: number }[] }[] = await res.json();
+
+    const counts: Record<string, number> = {};
+    for (const release of releases) {
+      const slug = /^(.+)-v\d/.exec(release.tag_name)?.[1];
+      if (!slug) continue;
+      counts[slug] = (counts[slug] ?? 0) + release.assets.reduce((n, a) => n + a.download_count, 0);
+    }
+    try {
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), counts }));
+    } catch {}
+    return counts;
+  }
+
+  const notes = document.querySelectorAll<HTMLElement>('[data-downloads]');
+  if (notes.length) {
+    downloadCounts()
+      .then((counts) => {
+        notes.forEach((note) => {
+          const n = counts[note.dataset.downloads!];
+          if (!n) return;
+          note.querySelector('[data-count]')!.textContent = n.toLocaleString('en-US');
+          note.querySelector('[data-unit]')!.textContent = n === 1 ? 'download' : 'downloads';
+          note.hidden = false;
+        });
+      })
+      // without the count the note simply stays as it was
+      .catch(() => {});
+  }
+</script>
