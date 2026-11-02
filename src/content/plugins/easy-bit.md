@@ -19,7 +19,8 @@ controls:
   - { name: Color Steps, default: "3" }
   - { name: Frame Repeat, default: "5" }
 cover: ./images/easy-bit.jpg
-coverAlt: The words Easy Bit in white over a pixelated, posterized photo of a drummer and a singer in a dim, warm-lit room.
+coverBrightness: 1.4
+coverAlt: The words EASY BIT in white over a pixel-art raccoon mask in dark blue, on a black background.
 tags: [pixel, 8-bit, retro, palette]
 changelog:
   - version: 1.0.0

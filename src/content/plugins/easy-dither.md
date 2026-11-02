@@ -20,7 +20,8 @@ controls:
   - { name: Posterize Steps, default: "3" }
   - { name: Color Mode, default: "Original" }
 cover: ./images/easy-dither.jpg
-coverAlt: The words EASY DITHER in white dot-pattern letters over a dithered night scene of a gothic castle, with a lantern-lit path in the foreground.
+coverBrightness: 1.4
+coverAlt: The words EASY DITHER in blue over a dithered, dimly lit figure wearing a spiked crown, on a black background.
 tags: [dither, retro, pixel, duotone]
 changelog:
   - version: 1.1.0

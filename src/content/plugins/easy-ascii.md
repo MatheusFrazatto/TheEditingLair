@@ -20,7 +20,8 @@ controls:
   - { name: Glyph Size, default: "1.5" }
   - { name: Contrast, default: "1" }
 cover: ./images/easy-ascii.jpg
-coverAlt: The words EASY ASCII built from yellow @ characters over a world map drawn in orange, pink and purple ASCII symbols on a dark navy background.
+coverBrightness: 1.4
+coverAlt: The words EASY ASCII in white dot characters over a dark red ASCII-art silhouette of a cloaked figure.
 tags: [ascii, text, retro, stylize]
 changelog:
   - version: 2.1.0

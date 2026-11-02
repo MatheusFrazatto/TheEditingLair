@@ -20,8 +20,8 @@ controls:
   - { name: Bloom Amount, default: "1" }
   - { name: Frame Repeat, default: "2" }
 cover: ./images/easy-crt.jpg
-coverBrightness: 2.1
-coverAlt: The words EASY CRT in red on a black CRT screen, crossed by wavy vertical scan lines.
+coverBrightness: 2.6
+coverAlt: The words EASY CRT in red over a red wireframe globe on a black screen.
 tags: [crt, retro, screen, glow]
 changelog:
   - version: 2.2.0
