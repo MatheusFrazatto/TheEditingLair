@@ -12,7 +12,7 @@ import { getPlugins, getPosts } from '../../lib/content';
 import { pluginTypeLabel } from '../../lib/plugin-types';
 import { isoDate } from '../../lib/format';
 import { withBase } from '../../lib/url';
-import { repoUrl, reportUrl } from '../../lib/site';
+import { reportUrl } from '../../lib/site';
 import { pluginSchema } from '../../lib/schema';
 
 export async function getStaticPaths() {
@@ -106,8 +106,8 @@ const shareImage =
               ))}
             </ol>
             <p class="log__follow">
-              Follow new versions through the <a href={withBase('plugins.xml')}><span class="ln">plugin updates feed</span></a>,
-              or on <a href={repoUrl} rel="noopener"><span class="ln">GitHub</span></a> with Watch, Custom, Releases.
+              Want to know when a new version is out? <a href={withBase('updates/')}><span class="ln">Follow the updates</span></a>
+              by RSS or on GitHub.
             </p>
           </section>
         )}

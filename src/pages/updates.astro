@@ -1,0 +1,209 @@
+---
+import Base from '../layouts/Base.astro';
+import { getUpdates } from '../lib/updates';
+import { isoDate } from '../lib/format';
+import { withBase } from '../lib/url';
+import { repoUrl } from '../lib/site';
+
+const updates = await getUpdates();
+const feeds = [
+  { name: 'Plugin updates', url: new URL(withBase('plugins.xml'), Astro.site).href },
+  { name: 'Notes', url: new URL(withBase('rss.xml'), Astro.site).href },
+];
+---
+<Base title="Updates" description="Every new plugin and new version on The Editing Lair, and how to follow them." current="plugins">
+  <div class="page">
+    <div class="sheet-wrap">
+      <article class="sheet doc">
+        <h1 class="display doc__title">Updates</h1>
+        <p class="lede">Every new plugin and every new version on the shelf, newest first.</p>
+
+        <section class="follow" id="follow" aria-labelledby="follow-title">
+          <h2 class="legend follow__title" id="follow-title">Follow by RSS</h2>
+          <p>
+            Paste an address into a feed reader such as Feedly, Inoreader or NetNewsWire, and new items show up there
+            on their own.
+          </p>
+          {feeds.map((feed) => (
+            <div class="follow__feed">
+              <p class="legend follow__name">{feed.name}</p>
+              <div class="follow__field">
+                <span class="n follow__url">{feed.url}</span>
+                <button class="follow__copy" type="button" data-copy={feed.url} aria-label={`Copy the ${feed.name.toLowerCase()} feed address`} hidden>Copy</button>
+              </div>
+            </div>
+          ))}
+          <p class="follow__status" role="status" data-copy-status></p>
+          <p>
+            With a GitHub account, you can also open the <a href={repoUrl} rel="noopener">repository</a> and choose
+            Watch, Custom, Releases to get an email for every new version.
+          </p>
+        </section>
+
+        <ol class="updates">
+          {updates.map((u) => (
+            <li>
+              <time class="n updates__date" datetime={u.date.toISOString()}>{isoDate(u.date)}</time>
+              <a class="updates__title" href={u.link}><span class="ln ln--quiet">{u.plugin}</span> <span class="n">{u.version}</span></a>
+              <p class="updates__notes">{u.notes}</p>
+            </li>
+          ))}
+        </ol>
+      </article>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px var(--gutter) 0;
+  }
+  .doc {
+    padding: clamp(26px, 4vw, 52px) clamp(20px, 5vw, 64px) clamp(36px, 5vw, 64px);
+    animation: settle 800ms var(--ease-settle) both;
+  }
+  .doc__title {
+    font-size: clamp(3rem, 7vw, 5.75rem);
+    color: var(--z0);
+  }
+  .lede {
+    margin: 20px 0 0;
+    max-width: 44ch;
+    font-size: 1.3125rem;
+    line-height: 1.5;
+    color: var(--z2);
+  }
+
+  .follow {
+    max-width: 44rem;
+    margin-top: 36px;
+    padding: 20px 22px 6px;
+    border: 1px solid var(--z8);
+    color: var(--z2);
+  }
+  .follow p {
+    max-width: var(--measure);
+    margin: 0 0 14px;
+  }
+  .follow__title {
+    margin: 0 0 10px;
+    font-size: 0.875rem;
+    color: var(--z0);
+  }
+  .follow__feed + .follow__feed {
+    margin-top: 14px;
+  }
+  .follow .follow__name {
+    margin: 0 0 6px;
+    font-size: 0.8125rem;
+    color: var(--z4);
+  }
+  .follow__field {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid var(--z6);
+    background: var(--z9);
+  }
+  .follow__url {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 12px;
+    font-size: 0.875rem;
+    color: var(--z0);
+    overflow-wrap: anywhere;
+    user-select: all;
+  }
+  .follow__copy {
+    flex: none;
+    padding: 0 18px;
+    border: 0;
+    background: var(--z0);
+    color: var(--z10);
+    font: 700 0.875rem/1 var(--f-legend);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 200ms var(--ease-out);
+  }
+  .follow__copy:hover {
+    background: var(--z2);
+  }
+  .follow__copy[hidden] {
+    display: none;
+  }
+  .follow .follow__status {
+    min-height: 1.5em;
+    margin: 6px 0 8px;
+    font: 500 0.9375rem/1.5 var(--f-legend);
+    color: var(--z3);
+  }
+
+  .updates {
+    margin: 44px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .updates li {
+    display: grid;
+    grid-template-columns: 7rem minmax(0, 1fr);
+    gap: 4px 20px;
+    padding: 16px 0 18px;
+    border-top: 1px solid var(--z8);
+  }
+  .updates li:last-child {
+    border-bottom: 1px solid var(--z8);
+  }
+  .updates__date {
+    padding-top: 6px;
+    font-size: 0.875rem;
+    color: var(--z4);
+  }
+  .updates__title {
+    font: 800 1.75rem/1 var(--f-display);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--z0);
+    text-decoration: none;
+  }
+  .updates__title .n {
+    font-size: 1rem;
+    letter-spacing: 0;
+    color: var(--z2);
+  }
+  .updates__notes {
+    grid-column: 2;
+    margin: 4px 0 0;
+    color: var(--z2);
+  }
+  @media (max-width: 760px) {
+    .updates li {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .updates__date {
+      padding-top: 0;
+    }
+    .updates__notes {
+      grid-column: 1;
+    }
+  }
+</style>
+
+<script>
+  // without the Clipboard API the buttons stay hidden; the addresses select in one click
+  const status = document.querySelector<HTMLElement>('[data-copy-status]');
+  if (status && navigator.clipboard) {
+    document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((button) => {
+      button.hidden = false;
+      button.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(button.dataset.copy!);
+          status.textContent = 'Address copied. Paste it into your feed reader.';
+        } catch {
+          status.textContent = 'Copying was blocked; select the address and copy it by hand.';
+        }
+      });
+    });
+  }
+</script>
