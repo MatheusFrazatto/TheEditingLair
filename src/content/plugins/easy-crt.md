@@ -21,8 +21,8 @@ controls:
   - { name: Frame Repeat, default: "2" }
 cover: ./images/easy-crt.jpg
 coverOriginal: ./images/easy-crt-original.jpg
-coverBrightness: 2.6
-coverAlt: The words EASY CRT in red over a red wireframe globe on a black screen.
+coverBrightness: 0.8
+coverAlt: The words EASY CRT and BY CADENZY in red over a Las Vegas casino street with a tall yellow kiosk, seen through CRT scanlines and a soft glow.
 preview:
   video: media/easy-crt/preview.mp4
   poster: ./images/easy-crt-preview.jpg

@@ -21,8 +21,8 @@ controls:
   - { name: Color Mode, default: "Original" }
 cover: ./images/easy-dither.jpg
 coverOriginal: ./images/easy-dither-original.jpg
-coverBrightness: 1.4
-coverAlt: The words EASY DITHER in blue over a dithered, dimly lit figure wearing a spiked crown, on a black background.
+coverBrightness: 1.2
+coverAlt: The words EASY DITHER and BY CADENZY in blue over a black-and-white dithered castle on a cliff under a cloudy night sky.
 preview:
   video: media/easy-dither/preview.mp4
   poster: ./images/easy-dither-preview.jpg

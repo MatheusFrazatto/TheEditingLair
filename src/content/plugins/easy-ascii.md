@@ -22,7 +22,7 @@ controls:
 cover: ./images/easy-ascii.jpg
 coverOriginal: ./images/easy-ascii-original.jpg
 coverBrightness: 2
-coverAlt: The words EASY ASCII in white dot characters over a dark red ASCII-art silhouette of a cloaked figure.
+coverAlt: The words EASY ASCII and BY CADENZY in yellow over a dark scene drawn in ASCII characters, three men at a street food counter, one of them aiming a pistol.
 preview:
   video: media/easy-ascii/preview.mp4
   poster: ./images/easy-ascii-preview.jpg

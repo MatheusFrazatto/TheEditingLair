@@ -20,8 +20,8 @@ controls:
   - { name: Frame Repeat, default: "5" }
 cover: ./images/easy-bit.jpg
 coverOriginal: ./images/easy-bit-original.jpg
-coverBrightness: 1.4
-coverAlt: The words EASY BIT in white over a pixel-art raccoon mask in dark blue, on a black background.
+coverBrightness: 1
+coverAlt: The words EASY BIT and BY CADENZY in pale pixel letters over a town square seen from above, reduced to coral and cream pixels on dark teal.
 preview:
   video: media/easy-bit/preview.mp4
   poster: ./images/easy-bit-preview.jpg
