@@ -15,7 +15,8 @@ const href = withBase(`plugins/${plugin.id}/`);
 const links = [
   d.cover && d.coverOriginal && { href: `${href}#compare`, icon: 'compare' as const, label: 'Before and after' },
   d.preview && { href: `${href}#preview`, icon: 'play' as const, label: 'Preview loop' },
-  { href: `${href}#controls`, icon: 'arrow' as const, label: 'Controls and install' },
+  // nothing to install before release
+  { href: `${href}#controls`, icon: 'arrow' as const, label: d.access.kind === 'soon' ? 'Controls' : 'Controls and install' },
 ].filter((link) => !!link);
 ---
 <nav class="pagelinks" aria-label={`On the ${d.title} page`}>

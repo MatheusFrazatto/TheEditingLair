@@ -57,7 +57,7 @@ const shareImage =
         <header class="doc__head">
           <h1 class="display doc__title">{d.title}</h1>
           <p class="legend doc__type">
-            {pluginTypeLabel[d.type]} · v<span class="n">{d.version}</span>
+            {pluginTypeLabel[d.type]} · {d.version ? <>v<span class="n">{d.version}</span></> : 'Coming soon'}
             {d.draft && <span class="draft-tag">Draft</span>}
           </p>
           <p class="doc__lede">{d.summary}</p>
@@ -141,7 +141,9 @@ const shareImage =
         {d.access.kind === 'free' && (
           <a class="rail__back legend" href={withBase('plugins/#easy-complete')}><Icon name="download" /><span class="ln ln--quiet">Every plugin in one zip</span></a>
         )}
-        <a class="rail__back legend" href={reportUrl({ title: d.title, version: d.version })} rel="noopener"><Icon name="external" /><span class="ln ln--quiet">Report a problem</span></a>
+        {d.version && (
+          <a class="rail__back legend" href={reportUrl({ title: d.title, version: d.version })} rel="noopener"><Icon name="external" /><span class="ln ln--quiet">Report a problem</span></a>
+        )}
       </div>
     </aside>
   </div>
@@ -174,7 +176,7 @@ const shareImage =
   }
   .doc__title {
     font-size: clamp(3rem, 7vw, 5.75rem);
-    color: var(--z0);
+    color: var(--act);
   }
   .doc__type {
     display: flex;
@@ -319,6 +321,7 @@ const shareImage =
   .rail__notes {
     padding: 0 20px;
     background: var(--z9);
+    --act: var(--red-deep);
   }
   .rail__notes :global(li:first-child) {
     border-top: 0;

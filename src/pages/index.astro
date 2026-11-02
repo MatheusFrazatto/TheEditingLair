@@ -4,7 +4,7 @@ import SheetDeck from '../components/SheetDeck.astro';
 import PluginTable from '../components/PluginTable.astro';
 import NoteList from '../components/NoteList.astro';
 import Icon from '../components/Icon.astro';
-import { getPlugins, getPosts } from '../lib/content';
+import { getPlugins, getPosts, isSoon } from '../lib/content';
 import { resolveFloor } from '../lib/format';
 import { withBase } from '../lib/url';
 import { websiteSchema } from '../lib/schema';
@@ -12,13 +12,16 @@ import { websiteSchema } from '../lib/schema';
 const plugins = await getPlugins();
 const posts = await getPosts();
 
-const featured = plugins.find((p) => p.data.featured) ?? plugins[0];
-// the featured plugin sits on top of the pile, the rest follow newest first
-const pile = featured ? [featured, ...plugins.filter((p) => p !== featured)] : [];
+// what can be had today; items still to come are shown but never counted or put on top
+const released = plugins.filter((p) => !isSoon(p));
+const soonCount = plugins.length - released.length;
 
-const freeCount = plugins.filter((p) => p.data.access.kind === 'free').length;
-const paidCount = plugins.length - freeCount;
-const floors = plugins.map((p) => resolveFloor(p.data.compatibility.resolve)).filter((n) => !Number.isNaN(n));
+const featured = released.find((p) => p.data.featured) ?? released[0];
+// the featured plugin sits on top of the pile, the rest follow newest first, the ones to come last
+const pile = featured ? [featured, ...plugins.filter((p) => p !== featured)] : [];
+const freeCount = released.filter((p) => p.data.access.kind === 'free').length;
+const paidCount = released.length - freeCount;
+const floors = released.map((p) => resolveFloor(p.data.compatibility.resolve)).filter((n) => !Number.isNaN(n));
 const oldestResolve = floors.length ? Math.min(...floors).toFixed(1) : null;
 ---
 <Base wedge="full" jsonLd={websiteSchema(Astro.site!)}>
@@ -29,9 +32,10 @@ const oldestResolve = floors.length ? Math.min(...floors).toFixed(1) : null;
           <SheetDeck plugins={pile} />
 
           <p class="readout legend">
-            <span>Shelf<span class="n" data-count-to={plugins.length}>{plugins.length}</span></span>
+            <span>Shelf<span class="n" data-count-to={released.length}>{released.length}</span></span>
             <span>Free<span class="n" data-count-to={freeCount}>{freeCount}</span></span>
             {paidCount > 0 && <span>Paid<span class="n" data-count-to={paidCount}>{paidCount}</span></span>}
+            {soonCount > 0 && <span>Coming<span class="n" data-count-to={soonCount}>{soonCount}</span></span>}
             {oldestResolve && <span>Runs on Resolve<span class="n" data-count-to={oldestResolve} data-suffix="+">{oldestResolve}+</span></span>}
           </p>
         </>
@@ -106,7 +110,7 @@ const oldestResolve = floors.length ? Math.min(...floors).toFixed(1) : null;
   }
   .top__title {
     font-size: clamp(3rem, 5vw, 4.375rem);
-    color: var(--z0);
+    color: var(--act);
   }
   .top__lede {
     max-width: 40em;
@@ -148,12 +152,13 @@ const oldestResolve = floors.length ? Math.min(...floors).toFixed(1) : null;
     flex-direction: column;
     padding: 44px clamp(24px, 3.4vw, 52px) 48px;
     background: var(--z9);
+    --act: var(--red-deep);
     color: var(--z1);
   }
   .side__title {
     margin-bottom: 22px;
     font-size: 2.875rem;
-    color: var(--z0);
+    color: var(--act);
   }
   .side__more {
     display: inline-flex;
@@ -192,7 +197,7 @@ const oldestResolve = floors.length ? Math.min(...floors).toFixed(1) : null;
   .shelf__title {
     margin-bottom: 22px;
     font-size: 2.875rem;
-    color: var(--z0);
+    color: var(--act);
   }
 
   @media (max-width: 1100px) {

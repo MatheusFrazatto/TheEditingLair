@@ -74,9 +74,12 @@ const slot = (i: number) => (i === 0 ? '0' : i === 1 ? '1' : i === total - 1 ? '
                 {d.access.kind === 'paid' && (
                   <span class="back__hold"><span class="n">{d.access.price}</span><span class="legend">Store</span></span>
                 )}
+                {d.access.kind === 'soon' && (
+                  <span class="back__hold back__hold--soon"><span class="legend">Soon</span></span>
+                )}
               </span>
               <span class="back__spec legend">
-                {pluginTypeLabel[d.type]} · v<span class="n">{d.version}</span> · Resolve <span class="n">{d.compatibility.resolve}</span>
+                {pluginTypeLabel[d.type]} · {d.version ? <>v<span class="n">{d.version}</span></> : 'Coming soon'} · Resolve <span class="n">{d.compatibility.resolve}</span>
               </span>
             </a>
           </div>
@@ -182,6 +185,7 @@ const slot = (i: number) => (i === 0 ? '0' : i === 1 ? '1' : i === total - 1 ? '
     background: var(--z10);
     border-color: var(--z10);
     color: var(--z1);
+    --act: var(--red-deep);
     cursor: grab;
     touch-action: pan-y;
   }
@@ -267,9 +271,10 @@ const slot = (i: number) => (i === 0 ? '0' : i === 1 ? '1' : i === total - 1 ? '
     align-items: baseline;
     gap: 10px 18px;
   }
+  /* the sheet in your hand is named in the safelight red */
   .top__title {
     font-size: clamp(3rem, 5vw, 4.375rem);
-    color: var(--z0);
+    color: var(--act);
   }
   .top__title a {
     text-decoration: none;
@@ -361,6 +366,8 @@ const slot = (i: number) => (i === 0 ? '0' : i === 1 ? '1' : i === total - 1 ? '
     --z8: rgb(242 242 242 / 0.22);
     --z9: rgb(242 242 242 / 0.1);
     --z10: #0d0d0d;
+    /* a dark ground again: back to the bright red */
+    --act: var(--red);
   }
   .card--print .face--front :global(.act--download) {
     color: #f2f2f2;
@@ -423,6 +430,12 @@ const slot = (i: number) => (i === 0 ? '0' : i === 1 ? '1' : i === total - 1 ? '
   .back__hold .legend {
     font-size: 0.6875rem;
     color: var(--z8);
+  }
+  /* not out yet: the stamp holds only its word, at a readable size */
+  .back__hold--soon .legend {
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
+    color: var(--z10);
   }
 
   /* ── Controls ───────────────────────────────────────────────────── */

@@ -1,9 +1,9 @@
-import { getPlugins } from './content';
+import { getReleased } from './content';
 import { withBase } from './url';
 
 /** Every plugin release, newest first; each links to its changelog entry. */
 export async function getUpdates() {
-  const plugins = await getPlugins();
+  const plugins = await getReleased();
   return plugins
     .flatMap((plugin) =>
       plugin.data.changelog.map((entry) => ({

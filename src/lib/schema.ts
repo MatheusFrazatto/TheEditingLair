@@ -23,15 +23,18 @@ export function websiteSchema(site: URL) {
 export function pluginSchema(plugin: CollectionEntry<'plugins'>, site: URL, image?: string) {
   const d = plugin.data;
   const { access } = d;
+  // an item that isn't out yet has nothing on offer
   const offer =
     access.kind === 'free'
       ? { '@type': 'Offer', price: '0', priceCurrency: 'USD' }
-      : {
-          '@type': 'Offer',
-          url: access.storeUrl,
-          price: access.price.replace(/[^\d.]/g, ''),
-          ...(access.price.includes('$') && { priceCurrency: 'USD' }),
-        };
+      : access.kind === 'paid'
+        ? {
+            '@type': 'Offer',
+            url: access.storeUrl,
+            price: access.price.replace(/[^\d.]/g, ''),
+            ...(access.price.includes('$') && { priceCurrency: 'USD' }),
+          }
+        : undefined;
 
   return {
     '@context': 'https://schema.org',
@@ -42,13 +45,12 @@ export function pluginSchema(plugin: CollectionEntry<'plugins'>, site: URL, imag
     applicationCategory: 'MultimediaApplication',
     applicationSubCategory: pluginTypeLabel[d.type],
     operatingSystem: d.compatibility.os.map((o) => osLabel[o]).join(', '),
-    softwareVersion: d.version,
+    ...(d.version && { softwareVersion: d.version }),
     softwareRequirements: `DaVinci Resolve ${d.compatibility.resolve} ${d.compatibility.edition === 'free' ? '(Free or Studio)' : 'Studio'}`,
-    datePublished: isoDate(d.released),
-    dateModified: isoDate(d.updated ?? d.released),
+    ...(d.released && { datePublished: isoDate(d.released), dateModified: isoDate(d.updated ?? d.released) }),
     ...(image && { image: new URL(image, site).href }),
     ...(access.kind === 'free' && { downloadUrl: access.download, ...(access.fileSize && { fileSize: access.fileSize }) }),
-    offers: offer,
+    ...(offer && { offers: offer }),
     author: author(site),
   };
 }

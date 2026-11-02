@@ -38,7 +38,7 @@ const posts = await getPosts();
   }
   .index__title {
     font-size: clamp(4rem, 9vw, 7.5rem);
-    color: var(--z10);
+    color: var(--act);
   }
   .index__intro {
     margin: 0 0 10px;
@@ -61,6 +61,7 @@ const posts = await getPosts();
   .panel {
     padding: 6px clamp(20px, 3.4vw, 48px) 10px;
     background: var(--z9);
+    --act: var(--red-deep);
     color: var(--z1);
   }
   .panel :global(li:first-child) {

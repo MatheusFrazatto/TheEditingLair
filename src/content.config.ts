@@ -17,7 +17,11 @@ export const pluginTypes = [
 
 // Free items download directly. Paid items never host the file here:
 // they point to an external storefront that handles payment and delivery.
+// Soon items are announced but not out: no file, no version, no release date.
 const access = z.discriminatedUnion('kind', [
+  z.object({
+    kind: z.literal('soon'),
+  }),
   z.object({
     kind: z.literal('free'),
     /** Path under /public (e.g. "downloads/glow-kit/GlowKit.setting") or a full URL (e.g. a GitHub Release asset). */
@@ -40,13 +44,16 @@ const plugins = defineCollection({
       title: z.string(),
       summary: z.string().max(160),
       type: z.enum(pluginTypes),
-      version: z.string(),
-      released: z.coerce.date(),
+      /** Required once released; a "soon" item leaves both out. */
+      version: z.string().optional(),
+      released: z.coerce.date().optional(),
       updated: z.coerce.date().optional(),
       compatibility: z.object({
         resolve: z.string(),
         edition: z.enum(['free', 'studio']).default('free'),
         os: z.array(z.enum(['windows', 'macos', 'linux'])).default(['windows', 'macos', 'linux']),
+        /** Replaces the edition aside, e.g. "Tested in Studio so far" while an item is still being tested. */
+        note: z.string().max(40).optional(),
       }),
       access,
       /** A few short lines on what the effect does, listed on the home sheet. */
@@ -68,6 +75,11 @@ const plugins = defineCollection({
         .default([]),
       featured: z.boolean().default(false),
       draft: z.boolean().default(false),
+    }).superRefine((d, ctx) => {
+      if (d.access.kind === 'soon') return;
+      for (const key of ['version', 'released'] as const) {
+        if (!d[key]) ctx.addIssue({ code: 'custom', path: [key], message: `${key} is required unless access.kind is "soon"` });
+      }
     }),
 });
 

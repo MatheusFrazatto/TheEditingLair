@@ -27,12 +27,21 @@ const { plugins, headingId } = Astro.props;
         {p.data.draft && <span class="draft-tag">Draft</span>}
       </span>
       <span role="cell"><span class="plan__label">Type</span>{pluginTypeLabel[p.data.type]}</span>
-      <span role="cell" class="n"><span class="plan__label">Version</span>{p.data.version}</span>
+      <span role="cell" class="n">
+        <span class="plan__label">Version</span>
+        {p.data.version ?? <span class="plan__none" aria-label="Not released">—</span>}
+      </span>
       <span role="cell" class="n"><span class="plan__label">Resolve</span>{p.data.compatibility.resolve}</span>
       <span role="cell"><span class="plan__label">Edition</span>{p.data.compatibility.edition === 'free' ? 'Resolve Free' : 'Studio only'}</span>
       <span role="cell" class="plan__access">
         <span class="plan__label">Access</span>
-        {p.data.access.kind === 'free' ? 'Free download' : <span class="is-paid n">{p.data.access.price}</span>}
+        {p.data.access.kind === 'free' ? (
+          'Free download'
+        ) : p.data.access.kind === 'paid' ? (
+          <span class="is-held is-paid n">{p.data.access.price}</span>
+        ) : (
+          <span class="is-held is-soon">Soon</span>
+        )}
       </span>
       <span class="plan__summary" role="cell">{p.data.summary}</span>
     </div>
@@ -87,7 +96,7 @@ const { plugins, headingId } = Astro.props;
     outline: none;
   }
   .plan__name a:focus-visible::after {
-    outline: 2px solid var(--filter);
+    outline: 2px solid var(--act);
     outline-offset: -2px;
   }
   .plan__name .draft-tag {
@@ -113,16 +122,32 @@ const { plugins, headingId } = Astro.props;
     font: 600 0.9375rem/1.2 var(--f-legend);
     letter-spacing: 0.02em;
   }
-  .is-paid {
+  /* held back: a hatched stamp, a price for paid items, Soon for ones not out yet */
+  .is-held {
     display: inline-block;
     position: relative;
     isolation: isolate;
     justify-self: start;
     padding: 2px 8px;
     border: 1px solid var(--z0);
+  }
+  .is-paid {
     font-size: 1rem;
   }
-  .is-paid::before {
+  .is-soon {
+    padding: 3px 9px 2px;
+    font: 700 0.8125rem/1.2 var(--f-legend);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  /* small caps over the hatch: the lighter hatch of the draft tag keeps the word readable */
+  .is-soon::before {
+    color: var(--z8);
+  }
+  .plan__none {
+    color: var(--z4);
+  }
+  .is-held::before {
     content: '';
     position: absolute;
     inset: 0;

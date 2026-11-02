@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import Icon from './Icon.astro';
 import DownloadAction from './DownloadAction.astro';
+import { withBase } from '../lib/url';
 
 interface Props {
   plugin: CollectionEntry<'plugins'>;
@@ -12,7 +13,7 @@ const { access, title } = Astro.props.plugin.data;
 ---
 {access.kind === 'free' ? (
   <DownloadAction href={access.download} fileName={access.fileName} fileSize={access.fileSize} countId={id} />
-) : (
+) : access.kind === 'paid' ? (
   <div class="access">
     <a class="act act--store" href={access.storeUrl} rel="noopener" target="_blank">
       <span class="act__main"><Icon name="external" />Buy{access.storeName ? ` on ${access.storeName}` : ''}</span>
@@ -20,6 +21,15 @@ const { access, title } = Astro.props.plugin.data;
     </a>
     <p class="act-note">
       Sold through {access.storeName ?? 'an external store'}, which handles payment and delivers {title}. Opens in a new tab.
+    </p>
+  </div>
+) : (
+  <div class="access">
+    <p class="act act--soon">
+      <span class="act__main">Coming soon</span>
+    </p>
+    <p class="act-note">
+      {title} isn't out yet. <a href={withBase('updates/#follow')}><span class="ln">Follow the updates</span></a> to hear when it ships.
     </p>
   </div>
 )}
@@ -34,5 +44,12 @@ const { access, title } = Astro.props.plugin.data;
   .access .act-note {
     margin: 0;
     max-width: 34ch;
+  }
+  .access .act-note a {
+    color: var(--z0);
+    text-decoration: none;
+  }
+  .access .act--soon {
+    margin: 0;
   }
 </style>

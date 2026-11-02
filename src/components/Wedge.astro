@@ -97,10 +97,14 @@ const TitleTag = size === 'full' ? 'h1' : 'p';
     grid-column: 1 / 6;
     padding: 22px 0 0 var(--gutter);
   }
+  /* The name is set in the safelight red, which holds contrast only over zones 0 to III
+     (3:1 on III, 2:1 on IV). It runs about 5.45 times its font size, so 5.7vw keeps it
+     ending inside zone III at every width above the narrow layout. */
   .wedge__name {
-    font-size: clamp(3.5rem, 6.1vw, 5.5rem);
+    font-size: clamp(2.75rem, 5.7vw, 5.5rem);
     line-height: 0.86;
     white-space: nowrap;
+    color: var(--red);
   }
   .wedge--compact .wedge__name {
     font-size: clamp(2.75rem, 4.2vw, 3.75rem);
@@ -115,8 +119,9 @@ const TitleTag = size === 'full' ? 'h1' : 'p';
     color: var(--z8);
   }
 
-  /* one nav item per light zone: VIII, IX, X */
+  /* one nav item per light zone: VIII, IX, X; light ground, so the deep red */
   .wedge__nav {
+    --act: var(--red-deep);
     grid-column: 9 / 12;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -134,7 +139,7 @@ const TitleTag = size === 'full' ? 'h1' : 'p';
     font: 700 clamp(0.8125rem, 1.3vw, 1.1875rem) / 1 var(--f-legend);
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    background: linear-gradient(var(--filter), var(--filter)) left bottom / 0 3px no-repeat;
+    background: linear-gradient(var(--red-deep), var(--red-deep)) left bottom / 0 3px no-repeat;
     transition: background-size 280ms var(--ease-out);
   }
   .wedge__nav a:hover,

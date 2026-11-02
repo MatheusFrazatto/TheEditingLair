@@ -10,19 +10,28 @@ interface Props {
 
 const { plugin, full = false } = Astro.props;
 const d = plugin.data;
+const soon = d.access.kind === 'soon';
+const editionAside = d.compatibility.note ?? (d.compatibility.edition === 'free' ? 'Studio works too' : 'Free edition not supported');
 ---
 <table class="rec">
   <caption class="visually-hidden">{d.title} details</caption>
   <tbody>
-    <tr><th scope="row">Version</th><td><span class="n">{d.version}</span>{d.updated && <span class="aside">updated <span class="n">{isoDate(d.updated)}</span></span>}</td></tr>
+    <tr>
+      <th scope="row">Version</th>
+      {soon ? (
+        <td>In development<span class="aside">not released</span></td>
+      ) : (
+        <td><span class="n">{d.version}</span>{d.updated && <span class="aside">updated <span class="n">{isoDate(d.updated)}</span></span>}</td>
+      )}
+    </tr>
     {full && <tr><th scope="row">Type</th><td>{pluginTypeLabel[d.type]}</td></tr>}
     <tr><th scope="row">Resolve</th><td><span class="n">{d.compatibility.resolve}</span></td></tr>
     <tr>
       <th scope="row">Edition</th>
-      <td>{d.compatibility.edition === 'free' ? 'Resolve Free' : 'Resolve Studio'}<span class="aside">{d.compatibility.edition === 'free' ? 'Studio works too' : 'Free edition not supported'}</span></td>
+      <td>{d.compatibility.edition === 'free' ? 'Resolve Free' : 'Resolve Studio'}<span class="aside">{editionAside}</span></td>
     </tr>
     {full && <tr><th scope="row">System</th><td>{d.compatibility.os.map((o) => osLabel[o]).join(' · ')}</td></tr>}
-    {full && <tr><th scope="row">Released</th><td><span class="n">{isoDate(d.released)}</span></td></tr>}
+    {full && d.released && <tr><th scope="row">Released</th><td><span class="n">{isoDate(d.released)}</span></td></tr>}
     {d.access.kind === 'free' && d.access.fileName && (
       <tr><th scope="row">File</th><td>{d.access.fileName}{d.access.fileSize && <span class="aside n">{d.access.fileSize}</span>}</td></tr>
     )}

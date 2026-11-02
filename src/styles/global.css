@@ -18,9 +18,13 @@
   --z9: #d8d8d8;
   --z10: #f2f2f2;
 
-  /* Filtration: marks only what acts on the page */
-  --filter: #cc1285;
-  --filter-deep: #a30e6a;
+  /* Safelight: the one light a black-and-white darkroom allows. Crimson, shared
+     with Kinetic; it marks what acts and names the page. */
+  --red: #f0435a; /* bright: lines, outlines and titles on dark ground */
+  --red-deep: #c21430; /* fills under white text; lines and titles on light zones */
+  --red-deeper: #9e0f27; /* the darker half of a deep fill */
+  /* the red for lines, outlines and titles on the current ground; light zones switch it to deep */
+  --act: var(--red);
 
   --f-display: 'Sofia Sans Extra Condensed Variable', 'Arial Narrow', sans-serif;
   --f-legend: 'Sofia Sans Condensed Variable', 'Arial Narrow', sans-serif;
@@ -64,7 +68,7 @@ body {
   font-family: var(--f-read);
   font-size: 1.0625rem;
   line-height: 1.6;
-  caret-color: var(--filter);
+  caret-color: var(--act);
 }
 
 main {
@@ -72,12 +76,12 @@ main {
 }
 
 ::selection {
-  background: var(--filter);
+  background: var(--red-deep);
   color: var(--z10);
 }
 
 :focus-visible {
-  outline: 2px solid var(--filter);
+  outline: 2px solid var(--act);
   outline-offset: 3px;
 }
 
@@ -115,7 +119,7 @@ video {
   top: -100px;
   z-index: 10;
   padding: 10px 16px;
-  background: var(--filter);
+  background: var(--red-deep);
   color: var(--z10);
   font: 700 1rem/1 var(--f-legend);
   letter-spacing: 0.12em;
@@ -159,12 +163,14 @@ video {
   position: relative;
   background: var(--z10);
   color: var(--z1);
+  /* on the paper, the bright red would sit below 3.5:1; the deep one holds 5.5:1 */
+  --act: var(--red-deep);
   /* film code notch on the right edge */
   clip-path: polygon(0 0, 100% 0, 100% 26px, calc(100% - 11px) 34px, 100% 42px, 100% 100%, 0 100%);
 }
 
 .sheet a:hover {
-  text-decoration-color: var(--filter);
+  text-decoration-color: var(--act);
 }
 
 /* ── Record table ───────────────────────────────────────────────────── */
@@ -236,16 +242,16 @@ video {
 }
 
 .act--download {
-  background: var(--filter);
+  background: var(--red-deep);
   color: var(--z10);
-  box-shadow: 0 10px 30px -10px rgb(204 18 133 / 0.7);
+  box-shadow: 0 10px 30px -10px rgb(194 20 48 / 0.7);
 }
 .act--download .act__seg {
-  background: var(--filter-deep);
+  background: var(--red-deeper);
 }
 .act--download:hover {
   transform: translateY(-2px);
-  box-shadow: 0 16px 34px -10px rgb(204 18 133 / 0.8);
+  box-shadow: 0 16px 34px -10px rgb(194 20 48 / 0.8);
 }
 .act--download:active {
   transform: translateY(0);
@@ -277,6 +283,23 @@ video {
 .act--store:hover {
   background: var(--z0);
   color: var(--z10);
+}
+
+/* Soon: held back whole, there is nothing to act on yet, so it is a stamp, not a control */
+.act--soon {
+  position: relative;
+  border: 1px solid var(--z0);
+  background: var(--z10);
+  color: var(--z0);
+  isolation: isolate;
+}
+.act--soon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  color: var(--z8);
+  background: var(--hatch);
 }
 
 .act-note {
@@ -471,14 +494,14 @@ html[data-intro='play'] *::after {
   scroll-margin-top: 24px;
 }
 
-/* ── Links: a filtration line exposes left to right ───────────────── */
+/* ── Links: a safelight line exposes left to right ───────────────── */
 .prose a,
 .side__about a,
 .ln {
   --line: currentColor;
   text-decoration: none;
   background:
-    linear-gradient(var(--filter), var(--filter)) 0 100% / 0 2px no-repeat,
+    linear-gradient(var(--act), var(--act)) 0 100% / 0 2px no-repeat,
     linear-gradient(var(--line), var(--line)) 0 100% / 100% 1px no-repeat;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
