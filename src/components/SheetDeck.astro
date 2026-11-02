@@ -127,7 +127,8 @@ const slot = (i: number) => (i === 0 ? '0' : i === 1 ? '1' : i === total - 1 ? '
   .card[data-pos='0'] {
     z-index: 5;
     width: min(100%, 800px);
-    margin: var(--top-offset) 0 0 clamp(0px, 3vw, 40px);
+    /* the inset only uses room the sheet does not need, so it never overhangs the pile */
+    margin: var(--top-offset) 0 0 clamp(0px, calc(100% - 800px), 40px);
     --rot: -0.8deg;
     filter: drop-shadow(0 28px 34px rgb(13 13 13 / 0.62)) drop-shadow(0 2px 3px rgb(13 13 13 / 0.4));
   }

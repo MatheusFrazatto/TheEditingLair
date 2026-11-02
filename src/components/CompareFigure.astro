@@ -10,10 +10,10 @@ interface Props {
 }
 
 const { title, effect, original, alt } = Astro.props;
-const widths = [640, 960, 1280];
+const widths = [640, 960, 1280, 1920];
 const sizes = '(max-width: 860px) 100vw, 860px';
 ---
-<figure class="compare" data-compare style="--pos: 50%">
+<figure class="compare" data-compare style={`--pos: 50%; --ratio: ${original.width / original.height}`}>
   <div class="compare__frame" data-frame>
     <Image class="compare__img" src={original} alt={`The same frame without ${title}.`} widths={widths} sizes={sizes} />
     <div class="compare__after">
@@ -38,6 +38,14 @@ const sizes = '(max-width: 860px) 100vw, 860px';
         </svg>
       </span>
     </div>
+    <button class="compare__full" type="button" data-full aria-label="View full screen" aria-pressed="false">
+      <svg class="compare__icon-open" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" />
+      </svg>
+      <svg class="compare__icon-close" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5" />
+      </svg>
+    </button>
   </div>
   <figcaption class="compare__cap">Drag the line to compare the original frame with {title}.</figcaption>
 </figure>
@@ -150,6 +158,61 @@ const sizes = '(max-width: 860px) 100vw, 860px';
     outline-offset: 3px;
   }
 
+  /* full screen: the frame fills the screen at its own aspect, on print black */
+  .compare__full {
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: var(--z0);
+    border: 1px solid rgb(242 242 242 / 0.45);
+    color: var(--z10);
+    cursor: pointer;
+    transition: border-color 200ms var(--ease-out), background-color 200ms var(--ease-out);
+  }
+  .compare__full:hover {
+    border-color: var(--z10);
+    background: var(--z1);
+  }
+  .compare__full svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: square;
+  }
+  .compare__icon-close,
+  [data-compare].is-full .compare__icon-open {
+    display: none;
+  }
+  [data-compare].is-full .compare__icon-close {
+    display: block;
+  }
+  [data-compare].is-full {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    margin: 0;
+    background: var(--z0);
+  }
+  [data-compare].is-full .compare__frame {
+    width: min(100vw, calc(100vh * var(--ratio)));
+    width: min(100vw, calc(100dvh * var(--ratio)));
+  }
+  [data-compare].is-full .compare__cap {
+    display: none;
+  }
+  :global(html.compare-open) {
+    overflow: hidden;
+  }
+
   .compare__cap {
     margin-top: 12px;
     font: 500 0.9375rem/1.3 var(--f-legend);
@@ -207,7 +270,7 @@ const sizes = '(max-width: 860px) 100vw, 860px';
     };
 
     frame.addEventListener('pointerdown', (e) => {
-      if (e.button !== 0) return;
+      if (e.button !== 0 || (e.target as HTMLElement).closest('[data-full]')) return;
       take();
       frame.setPointerCapture(e.pointerId);
       root.classList.add('is-held');
@@ -238,6 +301,56 @@ const sizes = '(max-width: 860px) 100vw, 860px';
       e.preventDefault();
       take();
       apply(moves[e.key]);
+    });
+
+    // ── full screen: the real Fullscreen API where it exists, a fixed layer
+    // over the page where it does not (iPhone Safari) ──
+    const full = root.querySelector<HTMLButtonElement>('[data-full]')!;
+    const isNative = () => document.fullscreenElement === root;
+    // The sheet keeps a transform from its settle animation, which would trap
+    // a fixed layer inside it, so the fallback lifts the figure to <body>.
+    let spot: Comment | null = null;
+
+    function setFull(on: boolean) {
+      root.classList.toggle('is-full', on);
+      document.documentElement.classList.toggle('compare-open', on);
+      full.setAttribute('aria-pressed', String(on));
+      full.setAttribute('aria-label', on ? 'Exit full screen' : 'View full screen');
+      if (!on && spot) {
+        spot.replaceWith(root);
+        spot = null;
+        full.focus({ preventScroll: true });
+      }
+    }
+
+    function liftToBody() {
+      spot = document.createComment('compare');
+      root.replaceWith(spot);
+      document.body.appendChild(root);
+      full.focus({ preventScroll: true });
+    }
+
+    full.addEventListener('click', async () => {
+      if (root.classList.contains('is-full')) {
+        if (isNative()) await document.exitFullscreen();
+        setFull(false);
+        return;
+      }
+      setFull(true);
+      try {
+        if (!root.requestFullscreen) throw new Error('no fullscreen');
+        await root.requestFullscreen();
+      } catch {
+        liftToBody();
+      }
+    });
+    // leaving native full screen with Esc or the browser UI
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement && root.classList.contains('is-full')) setFull(false);
+    });
+    // Esc closes the fixed layer when there is no native full screen
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && root.classList.contains('is-full') && !isNative()) setFull(false);
     });
 
     apply(50);

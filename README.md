@@ -60,7 +60,7 @@ There is no UI framework and no client-side router. Pages are plain HTML and CSS
 
 **Motion that respects the reader.** A short intro plays once per session, can be skipped with any key or click, and has failsafe timeouts so the page can never get stuck behind it. Everything honors `prefers-reduced-motion`. The cover images sit in black and white and develop into color on hover or keyboard focus.
 
-**Before and after, on every plugin page.** The cover is a comparison of the same frame with and without the effect, split by a divider you drag with a mouse or finger, or move with the arrow, Page and Home/End keys. It is an ARIA slider that reports how much of the original is showing, the vertical page scroll still works on touch screens, and a single sweep of the divider hints that it moves the first time it comes into view (skipped with reduced motion or once you touch it).
+**Before and after, on every plugin page.** The cover is a comparison of the same frame with and without the effect, split by a divider you drag with a mouse or finger, or move with the arrow, Page and Home/End keys. It is an ARIA slider that reports how much of the original is showing, the vertical page scroll still works on touch screens, and a single sweep of the divider hints that it moves the first time it comes into view (skipped with reduced motion or once you touch it). A full-screen button uses the Fullscreen API, and falls back to a layer over the page where the API is missing, as on iPhone.
 
 **Downloads stay byte-identical.** `.gitattributes` marks `public/downloads/**` as binary, so line-ending conversion can never change a macro between my Resolve folder and the visitor's download.
 

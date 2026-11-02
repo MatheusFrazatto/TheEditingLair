@@ -397,6 +397,13 @@ video {
   vertical-align: baseline;
   font-variant-numeric: tabular-nums;
 }
+/* a wide table scrolls inside the sheet instead of widening the page */
+@media (max-width: 760px) {
+  .prose table {
+    display: block;
+    overflow-x: auto;
+  }
+}
 .prose blockquote {
   margin: 1.4em 0;
   padding: 2px 0 2px 20px;
