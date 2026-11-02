@@ -26,6 +26,9 @@ const d = plugin.data;
     {d.access.kind === 'free' && d.access.fileName && (
       <tr><th scope="row">File</th><td>{d.access.fileName}{d.access.fileSize && <span class="aside n">{d.access.fileSize}</span>}</td></tr>
     )}
+    {full && d.access.kind === 'free' && (
+      <tr><th scope="row">Use</th><td>Personal and commercial<span class="aside">no resale or re-sharing</span></td></tr>
+    )}
     {d.access.kind === 'paid' && <tr><th scope="row">Price</th><td><span class="n">{d.access.price}</span><span class="aside">external store</span></td></tr>}
   </tbody>
 </table>

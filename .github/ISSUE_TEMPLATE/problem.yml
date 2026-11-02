@@ -1,0 +1,44 @@
+name: Report a problem
+description: A plugin does not install, does not show up, or does not work as described.
+labels: [problem]
+body:
+  - type: input
+    id: plugin
+    attributes:
+      label: Plugin
+      placeholder: Easy CRT
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Plugin version
+      description: Shown in the plugin's header in the Inspector, and on its page.
+      placeholder: 2.2.0
+    validations:
+      required: true
+  - type: input
+    id: resolve
+    attributes:
+      label: DaVinci Resolve version and edition
+      description: Help > About DaVinci Resolve.
+      placeholder: Resolve Studio 20.2
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Windows
+        - macOS
+        - Linux
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what you got instead. Screenshots of the node graph or the Inspector help a lot.
+    validations:
+      required: true

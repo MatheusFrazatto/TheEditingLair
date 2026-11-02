@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Install help
+    url: https://matheusfrazatto.github.io/TheEditingLair/notes/how-to-install-fusion-macros/
+    about: Where macro files go on Windows, macOS and Linux, and how to find them in Resolve.

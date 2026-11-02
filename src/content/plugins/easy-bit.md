@@ -9,9 +9,9 @@ compatibility:
   edition: free
 access:
   kind: free
-  download: downloads/easy-bit/Easy%20Bit.setting
-  fileName: Easy Bit.setting
-  fileSize: 52 KB
+  download: https://github.com/MatheusFrazatto/TheEditingLair/releases/download/easy-bit-v1.0.0/Easy-Bit-v1.0.0.zip
+  fileName: Easy-Bit-v1.0.0.zip
+  fileSize: 7 KB
 controls:
   - { name: Pixel Size, default: "6" }
   - { name: Texture, default: "Clean" }
@@ -22,6 +22,10 @@ cover: ./images/easy-bit.jpg
 coverOriginal: ./images/easy-bit-original.jpg
 coverBrightness: 1.4
 coverAlt: The words EASY BIT in white over a pixel-art raccoon mask in dark blue, on a black background.
+preview:
+  video: media/easy-bit/preview.mp4
+  poster: ./images/easy-bit-preview.jpg
+  credit: "Footage: Sly Cooper trailer."
 tags: [pixel, 8-bit, retro, palette]
 changelog:
   - version: 1.0.0
@@ -67,7 +71,7 @@ Tone starts collapsed; click a section name in the Inspector to open it. Set Fra
 
 ## Install
 
-1. Download `Easy Bit.setting`.
+1. Download the zip and unzip it to get `Easy Bit.setting`.
 2. Copy it into your Fusion Macros folder:
    - Windows: `%AppData%\Blackmagic Design\DaVinci Resolve\Support\Fusion\Macros`
    - macOS: `~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Macros`

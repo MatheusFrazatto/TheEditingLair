@@ -10,9 +10,9 @@ compatibility:
   edition: studio
 access:
   kind: free
-  download: downloads/easy-crt/Easy%20CRT.setting
-  fileName: Easy CRT.setting
-  fileSize: 35 KB
+  download: https://github.com/MatheusFrazatto/TheEditingLair/releases/download/easy-crt-v2.2.0/Easy-CRT-v2.2.0.zip
+  fileName: Easy-CRT-v2.2.0.zip
+  fileSize: 4 KB
 controls:
   - { name: Curvature, default: "-0.4" }
   - { name: Mask Size, default: "1" }
@@ -23,6 +23,10 @@ cover: ./images/easy-crt.jpg
 coverOriginal: ./images/easy-crt-original.jpg
 coverBrightness: 2.6
 coverAlt: The words EASY CRT in red over a red wireframe globe on a black screen.
+preview:
+  video: media/easy-crt/preview.mp4
+  poster: ./images/easy-crt-preview.jpg
+  credit: "Footage: The Finals trailer."
 tags: [crt, retro, screen, glow]
 changelog:
   - version: 2.2.0
@@ -70,7 +74,7 @@ Halation & Grain, Color Fringe, Signal and Advanced start collapsed; click a sec
 
 ## Install
 
-1. Download `Easy CRT.setting`.
+1. Download the zip and unzip it to get `Easy CRT.setting`.
 2. Copy it into your Fusion Macros folder:
    - Windows: `%AppData%\Blackmagic Design\DaVinci Resolve\Support\Fusion\Macros`
    - macOS: `~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Macros`

@@ -1,0 +1,17 @@
+name: Request a plugin or a feature
+description: An idea for a new plugin, or a control you wish an existing one had.
+labels: [request]
+body:
+  - type: input
+    id: plugin
+    attributes:
+      label: Plugin
+      description: Leave empty for a new plugin idea.
+      placeholder: Easy Dither
+  - type: textarea
+    id: idea
+    attributes:
+      label: The idea
+      description: What look or control you are after. A reference image or video link helps.
+    validations:
+      required: true

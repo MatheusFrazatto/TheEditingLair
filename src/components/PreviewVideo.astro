@@ -1,0 +1,233 @@
+---
+import type { ImageMetadata } from 'astro';
+import { getImage } from 'astro:assets';
+import { withBase } from '../lib/url';
+
+interface Props {
+  title: string;
+  /** Path under /public. */
+  video: string;
+  poster: ImageMetadata;
+  credit?: string;
+}
+
+const { title, video, poster, credit } = Astro.props;
+// the poster is the first frame, so the loop starts without a jump
+const posterImg = await getImage({ src: poster, width: Math.min(1600, poster.width), format: 'webp', quality: 82 });
+---
+<figure class="preview" data-preview style={`--ratio: ${poster.width / poster.height}`}>
+  <div class="preview__frame">
+    <!-- without JavaScript the browser's own controls stay; the script swaps in the bar -->
+    <video
+      class="preview__video"
+      src={withBase(video)}
+      poster={posterImg.src}
+      width={poster.width}
+      height={poster.height}
+      muted
+      loop
+      playsinline
+      preload="none"
+      controls
+      aria-label={`${title} in motion, a silent loop`}
+      data-video
+    ></video>
+    <div class="preview__bar" data-bar hidden>
+      <button class="preview__btn" type="button" data-play aria-label="Play">
+        <svg class="preview__icon-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M7 5v14l11-7Z" />
+        </svg>
+        <svg class="preview__icon-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M8 5v14M16 5v14" />
+        </svg>
+      </button>
+      <button class="preview__btn" type="button" data-full aria-label="View full screen" aria-pressed="false">
+        <svg class="preview__icon-open" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" />
+        </svg>
+        <svg class="preview__icon-close" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5" />
+        </svg>
+      </button>
+    </div>
+  </div>
+  <figcaption class="preview__cap">
+    {title} in motion, on a silent loop.{credit && <span class="preview__credit"> {credit}</span>}
+  </figcaption>
+</figure>
+
+<style>
+  .preview {
+    margin: 0 0 40px;
+  }
+  .preview__frame {
+    position: relative;
+    overflow: hidden;
+    background: var(--z0);
+  }
+  .preview__video {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: var(--ratio);
+    background: var(--z0);
+  }
+  [data-preview].is-ready .preview__video {
+    cursor: pointer;
+  }
+
+  .preview__bar {
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+    display: flex;
+    gap: 8px;
+  }
+  .preview__bar[hidden] {
+    display: none;
+  }
+  .preview__btn {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: var(--z0);
+    border: 1px solid rgb(242 242 242 / 0.45);
+    color: var(--z10);
+    cursor: pointer;
+    transition: border-color 200ms var(--ease-out), background-color 200ms var(--ease-out);
+  }
+  .preview__btn:hover {
+    border-color: var(--z10);
+    background: var(--z1);
+  }
+  .preview__btn:focus-visible {
+    outline: 2px solid var(--filter);
+    outline-offset: 3px;
+  }
+  .preview__btn svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
+  }
+  .preview__icon-pause,
+  .preview__icon-close,
+  [data-preview].is-playing .preview__icon-play,
+  [data-preview].is-full .preview__icon-open {
+    display: none;
+  }
+  [data-preview].is-playing .preview__icon-pause,
+  [data-preview].is-full .preview__icon-close {
+    display: block;
+  }
+
+  /* full screen: the frame fills the screen at its own aspect, on print black */
+  [data-preview].is-full {
+    display: grid;
+    place-items: center;
+    margin: 0;
+    background: var(--z0);
+  }
+  [data-preview].is-full .preview__frame {
+    width: min(100vw, calc(100vh * var(--ratio)));
+    width: min(100vw, calc(100dvh * var(--ratio)));
+  }
+  [data-preview].is-full .preview__cap {
+    display: none;
+  }
+
+  .preview__cap {
+    margin-top: 12px;
+    font: 500 0.9375rem/1.3 var(--f-legend);
+    letter-spacing: 0.01em;
+    color: var(--z4);
+    text-wrap: pretty;
+  }
+
+  @media (max-width: 760px) {
+    .preview__bar {
+      right: 10px;
+      bottom: 10px;
+    }
+  }
+</style>
+
+<script>
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function setupPreview(root: HTMLElement) {
+    const video = root.querySelector<HTMLVideoElement>('[data-video]')!;
+    const bar = root.querySelector<HTMLElement>('[data-bar]')!;
+    const play = root.querySelector<HTMLButtonElement>('[data-play]')!;
+    const full = root.querySelector<HTMLButtonElement>('[data-full]')!;
+
+    video.controls = false;
+    bar.hidden = false;
+    root.classList.add('is-ready');
+
+    // The loop plays while it is in view. A pause from the visitor, or reduced
+    // motion, keeps it still until they press play themselves.
+    let held = reduceMotion;
+    // autoplay can be refused (power saving, data saver); the play button stays
+    const start = () => video.play().catch(() => {});
+
+    const sync = () => {
+      const playing = !video.paused;
+      root.classList.toggle('is-playing', playing);
+      play.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+    };
+    video.addEventListener('play', sync);
+    video.addEventListener('pause', sync);
+
+    const toggle = () => {
+      if (video.paused) {
+        held = false;
+        start();
+      } else {
+        held = true;
+        video.pause();
+      }
+    };
+    play.addEventListener('click', toggle);
+    video.addEventListener('click', toggle);
+
+    new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          if (!held) start();
+        } else if (!video.paused) {
+          video.pause();
+        }
+      },
+      { threshold: 0.5 },
+    ).observe(root);
+
+    // full screen: the figure where the Fullscreen API exists, the native
+    // player where it does not (iPhone Safari)
+    full.addEventListener('click', async () => {
+      if (document.fullscreenElement === root) {
+        await document.exitFullscreen();
+        return;
+      }
+      try {
+        if (!root.requestFullscreen) throw new Error('no fullscreen');
+        await root.requestFullscreen();
+      } catch {
+        (video as HTMLVideoElement & { webkitEnterFullscreen?: () => void }).webkitEnterFullscreen?.();
+      }
+    });
+    document.addEventListener('fullscreenchange', () => {
+      const on = document.fullscreenElement === root;
+      root.classList.toggle('is-full', on);
+      full.setAttribute('aria-pressed', String(on));
+      full.setAttribute('aria-label', on ? 'Exit full screen' : 'View full screen');
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-preview]').forEach(setupPreview);
+</script>

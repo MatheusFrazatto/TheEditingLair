@@ -1,5 +1,6 @@
 ---
 import { withBase } from '../lib/url';
+import { reportUrl } from '../lib/site';
 import Icon from './Icon.astro';
 
 const year = new Date().getFullYear();
@@ -15,6 +16,7 @@ const year = new Date().getFullYear();
       <li><a href={withBase('notes/')}><span class="ln ln--quiet">Notes</span></a></li>
       <li><a href={withBase('about/')}><span class="ln ln--quiet">About</span></a></li>
       <li><a href={withBase('rss.xml')}><Icon name="rss" /><span class="ln ln--quiet">RSS</span></a></li>
+      <li><a href={reportUrl()} rel="noopener"><Icon name="external" /><span class="ln ln--quiet">Report a problem</span></a></li>
     </ul>
     <p class="foot__fine">
       <span class="n">© {year}</span> Cadenzy. DaVinci Resolve and Fusion are trademarks of Blackmagic Design;

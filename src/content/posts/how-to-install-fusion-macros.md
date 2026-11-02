@@ -2,6 +2,7 @@
 title: How to install a Fusion macro in DaVinci Resolve
 description: Where a .setting file goes, how to make it show up on both the Fusion and Edit pages, and a quick way to try one without installing it.
 published: 2026-10-31
+updated: 2026-11-02
 category: tutorial
 tags: [fusion, macros, install]
 relatedPlugins: [easy-crt, easy-ascii, easy-dither, easy-bit]
@@ -11,7 +12,7 @@ Every plugin on this shelf is a Fusion macro: a single `.setting` file. There is
 
 ## 1. Download the file
 
-Each plugin page has a **Download** button that saves a file such as `Easy CRT.setting`. Keep the name as it is; Resolve uses the file name as the effect name.
+Each plugin page has a **Download** button that saves a zip such as `Easy-CRT-v2.2.0.zip`. Unzip it (double-click it on macOS; on Windows, right-click it and choose **Extract All**) to get the macro itself, a file such as `Easy CRT.setting`. Keep that name as it is; Resolve uses the file name as the effect name.
 
 ## 2. Copy it into the Macros folder
 

@@ -57,6 +57,10 @@ const plugins = defineCollection({
       coverAlt: z.string().optional(),
       /** Brightness of the black-and-white cover at rest; raise it for dark images (e.g. 2 for a red-on-black frame). */
       coverBrightness: z.number().min(0.5).max(3).default(1),
+      /** A short silent loop of the effect: video path under /public, its first frame as the poster, and where the footage comes from. */
+      preview: z
+        .object({ video: z.string(), poster: image(), credit: z.string().optional() })
+        .optional(),
       video: z.url().optional(),
       tags: z.array(z.string()).default([]),
       changelog: z

@@ -1,6 +1,6 @@
 # The Editing Lair
 
-A small static site where I publish the DaVinci Resolve tools I build for my own edits, mostly Fusion macros, along with short notes on editing and Resolve.
+A small static site where I publish the DaVinci Resolve tools I build for my own edits, mostly Fusion macros, along with short notes on editing and Resolve. Built by Matheus Frazatto, who signs the plugins as Cadenzy.
 
 **Live site:** https://matheusfrazatto.github.io/TheEditingLair/
 
@@ -22,6 +22,8 @@ I work in tech, so the site is also a deliberate exercise: a content-driven site
 | [Easy ASCII](https://matheusfrazatto.github.io/TheEditingLair/plugins/easy-ascii/) | Rebuilds footage out of text characters, with 13 character sets and 15 palettes | Free and Studio |
 | [Easy Dither](https://matheusfrazatto.github.io/TheEditingLair/plugins/easy-dither/) | Ordered dithering with six procedural patterns and duotone presets | Free and Studio |
 | [Easy Bit](https://matheusfrazatto.github.io/TheEditingLair/plugins/easy-bit/) | Pixel art with crisp blocks and CGA, Game Boy, NES and PICO-8 palettes | Free and Studio |
+
+The plugins are free to use in any project, personal or commercial. Please do not sell them or share the files themselves; link to the plugin page instead. Found a problem or have an idea? [Open an issue](https://github.com/MatheusFrazatto/TheEditingLair/issues/new/choose).
 
 A Fusion macro is a `.setting` file: a Lua table describing a group of nodes and the controls exposed in the Inspector. Some things I care about when building them:
 
@@ -62,7 +64,15 @@ There is no UI framework and no client-side router. Pages are plain HTML and CSS
 
 **Before and after, on every plugin page.** The cover is a comparison of the same frame with and without the effect, split by a divider you drag with a mouse or finger, or move with the arrow, Page and Home/End keys. It is an ARIA slider that reports how much of the original is showing, the vertical page scroll still works on touch screens, and a single sweep of the divider hints that it moves the first time it comes into view (skipped with reduced motion or once you touch it). A full-screen button uses the Fullscreen API, and falls back to a layer over the page where the API is missing, as on iPhone.
 
-**Downloads stay byte-identical.** `.gitattributes` marks `public/downloads/**` as binary, so line-ending conversion can never change a macro between my Resolve folder and the visitor's download.
+**Previews that play only when seen.** Each plugin page has a short silent loop of the effect. The video loads nothing until it scrolls into view, plays while at least half of it is on screen and pauses when it leaves. A visitor's pause, or `prefers-reduced-motion`, keeps it still until they press play. The poster is the first frame, so the loop starts without a jump, and without JavaScript the browser's own controls remain.
+
+**Links that preview well.** Every page carries Open Graph and Twitter card tags. A plugin page shares its cover, resized at build time; other pages share a site card in the same step-wedge look.
+
+**Issue forms instead of a contact form.** There is no backend, so problems and requests go to GitHub Issues through forms. The "Report a problem" link on each plugin page pre-fills the plugin and its version.
+
+**Counted downloads without a backend.** Each plugin version is a GitHub Release, and the Download button points at its asset, so GitHub counts every download. The plugin page asks the public Releases API for the total across all versions, caches it for the session, and leaves the note as it was if GitHub does not answer. Release assets cannot keep spaces in their names, and Resolve shows the file name as the effect name, so `npm run release` ships each macro inside a zip it writes itself (no dependency), under its exact name, byte for byte. It creates the release from the changelog and points the page at it.
+
+**Downloads stay byte-identical.** `.gitattributes` marks `public/downloads/**` as binary, so line-ending conversion can never change a macro between my Resolve folder and the zip.
 
 **Accessibility basics.** Skip link, visible focus states, semantic landmarks, ARIA table roles on the plugin table, and alt text on every cover.
 
@@ -83,8 +93,11 @@ src/
   lib/              base-path links, content queries, formatting
   styles/           design tokens and global styles
 public/
-  downloads/        the .setting files served for download
+  downloads/        the current .setting of each plugin, the source of its release zip
+  media/            silent preview loops, one folder per plugin
 .github/workflows/  build and deploy to GitHub Pages
+.github/ISSUE_TEMPLATE/  problem and request forms
+scripts/release.mjs zip a plugin and publish it as a GitHub Release
 ```
 
 ## Running it locally
@@ -110,10 +123,16 @@ SITE_URL=https://matheusfrazatto.github.io BASE_PATH=/TheEditingLair npm run bui
 1. Put the `.setting` file in `public/downloads/<slug>/`.
 2. Add a cover image to `src/content/plugins/images/`.
 3. Optionally add the same frame without the effect as `<slug>-original.jpg` and point `coverOriginal` at it to get the before/after comparison.
-4. Create `src/content/plugins/<slug>.md` with the frontmatter (the schema in `src/content.config.ts` lists every field) and write the page body.
-5. Run `npm run check`, then push to `main`. GitHub Actions builds and deploys the site.
+4. Optionally add a short silent loop as `public/media/<slug>/preview.mp4`, with its first frame as `<slug>-preview.jpg`, and point `preview` at both.
+5. Create `src/content/plugins/<slug>.md` with the frontmatter (the schema in `src/content.config.ts` lists every field) and write the page body.
+6. Run `npm run release -- <slug>`. It zips the `.setting`, creates the GitHub Release `<slug>-v<version>` with the changelog notes, and updates the download, file name and size on the page.
+7. Run `npm run check`, then push to `main`. GitHub Actions builds and deploys the site.
 
 Setting `draft: true` keeps a plugin or note visible in the dev server only.
+
+## License
+
+The website's source code is [MIT licensed](LICENSE). The plugins, images, preview videos and written content are not: the plugins are free to use in any project, commercial included, but may not be resold or redistributed.
 
 ---
 

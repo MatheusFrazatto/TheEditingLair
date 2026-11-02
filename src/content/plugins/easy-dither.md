@@ -10,9 +10,9 @@ compatibility:
   edition: free
 access:
   kind: free
-  download: downloads/easy-dither/Easy%20Dither.setting
-  fileName: Easy Dither.setting
-  fileSize: 34 KB
+  download: https://github.com/MatheusFrazatto/TheEditingLair/releases/download/easy-dither-v1.1.0/Easy-Dither-v1.1.0.zip
+  fileName: Easy-Dither-v1.1.0.zip
+  fileSize: 5 KB
 controls:
   - { name: Dither Size, default: "5" }
   - { name: Pattern, default: "Bayer 2x2" }
@@ -23,6 +23,10 @@ cover: ./images/easy-dither.jpg
 coverOriginal: ./images/easy-dither-original.jpg
 coverBrightness: 1.4
 coverAlt: The words EASY DITHER in blue over a dithered, dimly lit figure wearing a spiked crown, on a black background.
+preview:
+  video: media/easy-dither/preview.mp4
+  poster: ./images/easy-dither-preview.jpg
+  credit: "Footage generated with Gemini."
 tags: [dither, retro, pixel, duotone]
 changelog:
   - version: 1.1.0
@@ -80,7 +84,7 @@ Duotone and Tone start collapsed; click a section name in the Inspector to open 
 
 ## Install
 
-1. Download `Easy Dither.setting`.
+1. Download the zip and unzip it to get `Easy Dither.setting`.
 2. Copy it into your Fusion Macros folder:
    - Windows: `%AppData%\Blackmagic Design\DaVinci Resolve\Support\Fusion\Macros`
    - macOS: `~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Macros`

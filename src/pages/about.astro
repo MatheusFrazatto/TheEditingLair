@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { withBase } from '../lib/url';
+import { reportUrl } from '../lib/site';
 ---
 <Base title="About" description="What The Editing Lair is, who makes it, and how downloads work." current="about">
   <div class="page">
@@ -29,10 +30,28 @@ import { withBase } from '../lib/url';
             asks for payment details.
           </p>
 
+          <h2>Using the plugins</h2>
+          <p>
+            Free plugins are yours to use in any project, personal or commercial. Please do not
+            sell them or share the files themselves; link to the plugin page here instead, so people always get the
+            current version.
+          </p>
+
+          <h2>Problems and requests</h2>
+          <p>
+            If a plugin misbehaves, or you have an idea for one, <a href={reportUrl()} rel="noopener">open an issue on
+            GitHub</a>. Every plugin page also has a link that fills in the plugin and version for you.
+          </p>
+
           <h2>Notice</h2>
           <p>
             DaVinci Resolve and Fusion are trademarks of Blackmagic Design. The Editing Lair is an independent project and
             is not affiliated with or endorsed by Blackmagic Design.
+          </p>
+          <p>
+            Some covers and preview clips show short excerpts of game trailers to demonstrate an effect. That footage
+            belongs to its owners. If you own something shown here and want it removed, <a href={reportUrl()} rel="noopener">open
+            an issue</a> and it will be taken down.
           </p>
         </div>
       </article>

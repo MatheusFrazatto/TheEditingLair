@@ -1,16 +1,18 @@
 ---
 import { render, type CollectionEntry } from 'astro:content';
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import PluginFacts from '../../components/PluginFacts.astro';
 import AccessAction from '../../components/AccessAction.astro';
 import NoteList from '../../components/NoteList.astro';
 import CompareFigure from '../../components/CompareFigure.astro';
+import PreviewVideo from '../../components/PreviewVideo.astro';
 import Icon from '../../components/Icon.astro';
 import { getPlugins, getPosts } from '../../lib/content';
 import { pluginTypeLabel } from '../../lib/plugin-types';
 import { isoDate } from '../../lib/format';
 import { withBase } from '../../lib/url';
+import { reportUrl } from '../../lib/site';
 
 export async function getStaticPaths() {
   const plugins = await getPlugins();
@@ -27,8 +29,15 @@ const { Content } = await render(plugin);
 
 const related = (await getPosts()).filter((p) => p.data.relatedPlugins.includes(plugin.id));
 const others = (await getPlugins()).filter((p) => p.id !== plugin.id).slice(0, 3);
+
+// the cover, in colour, is the picture a shared link shows
+const share = d.cover && (await getImage({ src: d.cover, width: 1200, format: 'jpg', quality: 82 }));
+const shareImage =
+  share && d.cover
+    ? { src: share.src, width: 1200, height: Math.round((1200 * d.cover.height) / d.cover.width), alt: d.coverAlt }
+    : undefined;
 ---
-<Base title={d.title} description={d.summary} current="plugins">
+<Base title={d.title} description={d.summary} current="plugins" image={shareImage}>
   <div class="page">
     <div class="sheet-wrap main-sheet">
       <article class="sheet doc">
@@ -61,6 +70,10 @@ const others = (await getPlugins()).filter((p) => p.id !== plugin.id).slice(0, 3
           <figure class="doc__figure" style={`--print-lift: ${d.coverBrightness}`}>
             <Image src={d.cover} alt={d.coverAlt ?? ''} widths={[640, 960, 1280]} sizes="(max-width: 860px) 100vw, 860px" />
           </figure>
+        )}
+
+        {d.preview && (
+          <PreviewVideo title={d.title} video={d.preview.video} poster={d.preview.poster} credit={d.preview.credit} />
         )}
 
         {d.video && (
@@ -112,7 +125,10 @@ const others = (await getPlugins()).filter((p) => p.id !== plugin.id).slice(0, 3
           </ul>
         </section>
       )}
-      <a class="rail__back legend" href={withBase('plugins/')}><Icon name="back" /><span class="ln ln--quiet">All plugins</span></a>
+      <div class="rail__links">
+        <a class="rail__back legend" href={withBase('plugins/')}><Icon name="back" /><span class="ln ln--quiet">All plugins</span></a>
+        <a class="rail__back legend" href={reportUrl({ title: d.title, version: d.version })} rel="noopener"><Icon name="external" /><span class="ln ln--quiet">Report a problem</span></a>
+      </div>
     </aside>
   </div>
 </Base>
@@ -318,6 +334,12 @@ const others = (await getPlugins()).filter((p) => p.id !== plugin.id).slice(0, 3
     margin-top: 6px;
     font-size: 0.8125rem;
     color: var(--z8);
+  }
+  .rail__links {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
   }
   .rail__back {
     display: inline-flex;

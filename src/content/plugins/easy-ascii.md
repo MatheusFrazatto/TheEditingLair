@@ -10,9 +10,9 @@ compatibility:
   edition: free
 access:
   kind: free
-  download: downloads/easy-ascii/Easy%20ASCII.setting
-  fileName: Easy ASCII.setting
-  fileSize: 75 KB
+  download: https://github.com/MatheusFrazatto/TheEditingLair/releases/download/easy-ascii-v2.1.0/Easy-ASCII-v2.1.0.zip
+  fileName: Easy-ASCII-v2.1.0.zip
+  fileSize: 7 KB
 controls:
   - { name: Density, default: "150" }
   - { name: Character Set, default: "Classic" }
@@ -23,6 +23,10 @@ cover: ./images/easy-ascii.jpg
 coverOriginal: ./images/easy-ascii-original.jpg
 coverBrightness: 2
 coverAlt: The words EASY ASCII in white dot characters over a dark red ASCII-art silhouette of a cloaked figure.
+preview:
+  video: media/easy-ascii/preview.mp4
+  poster: ./images/easy-ascii-preview.jpg
+  credit: "Footage: Cyberpunk trailer."
 tags: [ascii, text, retro, stylize]
 changelog:
   - version: 2.1.0
@@ -82,7 +86,7 @@ Tone, Typography and Color Correction start collapsed; click a section name in t
 
 ## Install
 
-1. Download `Easy ASCII.setting`.
+1. Download the zip and unzip it to get `Easy ASCII.setting`.
 2. Copy it into your Fusion Macros folder:
    - Windows: `%AppData%\Blackmagic Design\DaVinci Resolve\Support\Fusion\Macros`
    - macOS: `~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Macros`
