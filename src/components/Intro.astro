@@ -70,9 +70,8 @@ const zones = ['0', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X']
   }
   .intro__name {
     font-size: clamp(3.5rem, 11vw, 9rem);
-    color: var(--z10);
+    color: var(--red);
     white-space: nowrap;
-    mix-blend-mode: difference;
   }
   /* the enlarger timer: its own dark readout, legible over any zone */
   .intro__timer {
@@ -97,6 +96,9 @@ const zones = ['0', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X']
     mix-blend-mode: difference;
   }
   @media (max-width: 760px) {
+    .intro__name {
+      font-size: clamp(2.5rem, 14vw, 3.5rem);
+    }
     .intro__bar {
       padding: 0 0 10px 5px;
       font-size: 0.6875rem;
