@@ -4,7 +4,7 @@ A small static site where I publish the DaVinci Resolve tools I build for my own
 
 **Live site:** https://matheusfrazatto.github.io/TheEditingLair/
 
-![The Editing Lair home page: a draggable pile of plugin sheets on a dark light table, with the Easy CRT sheet on top](.github/readme/home.jpg)
+![The Editing Lair home page: the red site name over a step-wedge masthead, and a draggable pile of plugin sheets on a dark light table, with Easy CRT on top and Kinetic marked as coming soon behind it](.github/readme/home.jpg)
 
 ## Why it exists
 
@@ -22,6 +22,7 @@ I work in tech, so the site is also a deliberate exercise: a content-driven site
 | [Easy ASCII](https://matheusfrazatto.github.io/TheEditingLair/plugins/easy-ascii/) | Rebuilds footage out of text characters, with 13 character sets and 15 palettes | Free and Studio |
 | [Easy Dither](https://matheusfrazatto.github.io/TheEditingLair/plugins/easy-dither/) | Ordered dithering with six procedural patterns and duotone presets | Free and Studio |
 | [Easy Bit](https://matheusfrazatto.github.io/TheEditingLair/plugins/easy-bit/) | Pixel art with crisp blocks and CGA, Game Boy, NES and PICO-8 palettes | Free and Studio |
+| [Kinetic](https://matheusfrazatto.github.io/TheEditingLair/plugins/kinetic/) *(coming soon)* | A script for easing Fusion keyframes: draggable bezier handles, easing presets, elastic springs and real bounces | Free and Studio (tested in Studio so far) |
 
 The plugins are free to use in any project, personal or commercial. Please do not sell them or share the files themselves; link to the plugin page instead. Found a problem or have an idea? [Open an issue](https://github.com/MatheusFrazatto/TheEditingLair/issues/new/choose).
 
@@ -49,7 +50,12 @@ There is no UI framework and no client-side router. Pages are plain HTML and CSS
 
 ## Engineering highlights
 
-**Content is data.** A plugin is one Markdown file. Its frontmatter is checked against a schema at build time: version, Resolve version, edition, OS list, a short feature list, cover image, changelog. A typo fails the build instead of shipping a broken page. Access is a discriminated union: a free plugin points to a file, while a paid one must point to an external store, so the site can never host a paid file or handle payments.
+**Content is data.** A plugin is one Markdown file. Its frontmatter is checked against a schema at build time: version, Resolve version, edition, OS list, a short feature list, cover image, changelog. A typo fails the build instead of shipping a broken page. Access is a discriminated union with three kinds:
+- a free plugin points to a file;
+- a paid one must point to an external store, so the site can never host a paid file or handle payments;
+- a coming-soon one has no file, version or release date yet, and the schema only allows those to be missing for that kind.
+
+**Announced before it ships.** A coming-soon tool gets a real page, a place at the back of the pile and a row in the plugins table, marked with a hatched "soon" stamp instead of a download. It stays out of everything that would promise a release: the release counts, the RSS feeds and Updates page, the Easy Complete bundle and the schema.org offer. Flipping it to free or paid makes it a normal release.
 
 **Works under a sub-path.** GitHub Pages serves the site from `/TheEditingLair/`. The workflow reads the origin and base path from `actions/configure-pages` and passes them to Astro, and every internal link goes through one `withBase()` helper. The same build also works at a domain root.
 
@@ -78,7 +84,11 @@ There is no UI framework and no client-side router. Pages are plain HTML and CSS
 
 **Accessibility basics.** Skip link, visible focus states, semantic landmarks, ARIA table roles on the plugin table, and alt text on every cover.
 
-![A plugin page: title, summary, a facts table with version, Resolve version, edition, systems and file, and a magenta download button](.github/readme/plugin-page.jpg)
+**One red, shared with the products.** The interface is grayscale, built from the eleven zones of a photographic step wedge, plus a single red. The red is the same Crimson as the tools' own identity (Kinetic's included), so the site and what it ships look like one family. A CSS variable sets the red for each surface: the bright red on dark ground and a deeper red on light paper, so text and focus rings keep their contrast on both. The site name in the masthead is sized to end over the darker zones, where the bright red still reads.
+
+![A plugin page: the red title, summary, a facts table with version, Resolve version, edition, systems, file and license, and a red download button with a download count](.github/readme/plugin-page.jpg)
+
+![A coming-soon page: Kinetic's title, a facts table that reads "In development, not released", a hatched Coming soon stamp in place of the download, and the script's window as the cover](.github/readme/kinetic-soon.jpg)
 
 ## Project structure
 
@@ -90,7 +100,7 @@ src/
   content.config.ts content schemas
   components/       sheet pile, plugin table, facts table, download button, masthead
   layouts/          base page layout
-  pages/            home, plugins, notes, about, RSS, 404
+  pages/            home, plugins, notes, about, updates, RSS, 404
   scripts/          intro and page motion
   lib/              base-path links, content queries, formatting
   styles/           design tokens and global styles
@@ -131,6 +141,8 @@ SITE_URL=https://matheusfrazatto.github.io BASE_PATH=/TheEditingLair npm run bui
 7. Run `npm run check`, then push to `main`. GitHub Actions builds and deploys the site.
 
 Setting `draft: true` keeps a plugin or note visible in the dev server only.
+
+To announce a tool before it ships, create its Markdown file with `access: { kind: soon }` and leave out `version`, `released` and the download. A cover is enough; `compatibility.note` can say what has been tested so far. Skip `npm run release` until it is out. When it ships, switch `access` to free or paid, add the version and release date, and follow the steps above.
 
 ## License
 
