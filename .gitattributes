@@ -1,5 +1,2 @@
-# Downloads ship byte-for-byte; never convert line endings
-public/downloads/** -text
-
 # Preview videos are binary
 public/media/** -text

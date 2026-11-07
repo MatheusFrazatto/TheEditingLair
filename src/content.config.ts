@@ -24,7 +24,7 @@ const access = z.discriminatedUnion('kind', [
   }),
   z.object({
     kind: z.literal('free'),
-    /** Path under /public (e.g. "downloads/glow-kit/GlowKit.setting") or a full URL (e.g. a GitHub Release asset). */
+    /** A full URL, normally the GitHub Release asset written by `npm run release`, or a path under /public. */
     download: z.string(),
     fileName: z.string().optional(),
     fileSize: z.string().optional(),

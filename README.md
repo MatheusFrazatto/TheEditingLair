@@ -80,7 +80,7 @@ There is no UI framework and no client-side router. Pages are plain HTML and CSS
 
 **Counted downloads without a backend.** Each plugin version is a GitHub Release, and the Download button points at its asset, so GitHub counts every download. The plugin page asks the public Releases API for the total across all versions, caches it for the session, and leaves the note as it was if GitHub does not answer. Release assets cannot keep spaces in their names, and Resolve shows the file name as the effect name, so `npm run release` ships each macro inside a zip it writes itself (no dependency), under its exact name, byte for byte. It creates the release from the changelog and points the page at it, then rebuilds Easy Complete, a zip of every free plugin, as its own counted release, so the bundle never falls behind; the build log warns if it ever does.
 
-**Downloads stay byte-identical.** `.gitattributes` marks `public/downloads/**` as binary, so line-ending conversion can never change a macro between my Resolve folder and the zip.
+**Built in a private workshop, published here.** The tools are developed, tested and built in a separate private repository, whose CI attaches each build to a private release. `npm run release` downloads that file with my own GitHub login and republishes it here, byte for byte, so no token ever reaches the site and the workshop stays closed. Only plugins with a free page on this site can go out this way.
 
 **Accessibility basics.** Skip link, visible focus states, semantic landmarks, ARIA table roles on the plugin table, and alt text on every cover.
 
@@ -105,11 +105,10 @@ src/
   lib/              base-path links, content queries, formatting
   styles/           design tokens and global styles
 public/
-  downloads/        the current .setting of each plugin, the source of its release zip
   media/            silent preview loops, one folder per plugin
 .github/workflows/  build and deploy to GitHub Pages
 .github/ISSUE_TEMPLATE/  problem and request forms
-scripts/release.mjs zip a plugin and publish it as a GitHub Release
+scripts/release.mjs fetch a plugin build, zip it and publish it as a GitHub Release
 ```
 
 ## Running it locally
@@ -132,12 +131,12 @@ SITE_URL=https://matheusfrazatto.github.io BASE_PATH=/TheEditingLair npm run bui
 
 ## Publishing a plugin
 
-1. Put the `.setting` file in `public/downloads/<slug>/`.
+1. Release the plugin in the workshop repository (`lair release <slug>`, then push the tag). Its CI tests and builds it and attaches the `.setting` to a private release `<slug>-v<version>`.
 2. Add a cover image to `src/content/plugins/images/`.
 3. Optionally add the same frame without the effect as `<slug>-original.jpg` and point `coverOriginal` at it to get the before/after comparison.
 4. Optionally add a short silent loop as `public/media/<slug>/preview.mp4`, with its first frame as `<slug>-preview.jpg`, and point `preview` at both.
 5. Create `src/content/plugins/<slug>.md` with the frontmatter (the schema in `src/content.config.ts` lists every field) and write the page body.
-6. Run `npm run release -- <slug>`. It zips the `.setting`, creates the GitHub Release `<slug>-v<version>` with the changelog notes, and updates the download, file name and size on the page. It then rebuilds Easy Complete (`src/data/easy-complete.json`); pass `--no-bundle` to skip that.
+6. Run `npm run release -- <slug>`. It downloads that `.setting`, zips it, creates the GitHub Release `<slug>-v<version>` with the changelog notes, and updates the download, file name and size on the page. It then rebuilds Easy Complete (`src/data/easy-complete.json`); pass `--no-bundle` to skip that.
 7. Run `npm run check`, then push to `main`. GitHub Actions builds and deploys the site.
 
 Setting `draft: true` keeps a plugin or note visible in the dev server only.

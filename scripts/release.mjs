@@ -3,9 +3,12 @@
 //   npm run release -- easy-crt             (add --dry-run to only build the zip)
 //   npm run release -- easy-complete        (rebuild the all-plugins bundle on its own)
 //
-// Takes the single .setting in public/downloads/<slug>/, zips it under its own
-// name (Release assets cannot keep spaces, a zip can), creates the release
-// <slug>-v<version> with that version's changelog notes, then rewrites the
+// The plugins are built in the private LairTools repository: there,
+// `lair release <slug>` tags <slug>-v<version> and CI attaches the built
+// .setting to a private release. This script downloads that file with your own
+// gh login (nothing secret reaches the site), zips it under its own name
+// (Release assets cannot keep spaces, a zip can), creates the public release
+// <slug>-v<version> here with that version's changelog notes, then rewrites the
 // download, fileName and fileSize lines of src/content/plugins/<slug>.md.
 // GitHub counts each download of the zip; the plugin page shows the total.
 //
@@ -21,6 +24,8 @@ import { crc32, deflateRawSync } from 'node:zlib';
 import { parse } from 'yaml';
 
 const REPO = 'MatheusFrazatto/TheEditingLair';
+// private: plugin builds come from its releases, and only free plugins are republished here
+const SOURCE = 'MatheusFrazatto/LairTools';
 const SITE = 'https://matheusfrazatto.github.io/TheEditingLair';
 const BUNDLE = { slug: 'easy-complete', title: 'Easy Complete', data: 'src/data/easy-complete.json' };
 const PLUGINS = 'src/content/plugins';
@@ -44,11 +49,11 @@ function releasePlugin(slug) {
   const pagePath = join(PLUGINS, `${slug}.md`);
   const page = readFileSync(pagePath, 'utf8');
   const { title, version, changelog = [] } = frontmatter(page);
-  const settingName = settingOf(slug);
-
   const tag = `${slug}-v${version}`;
+  const setting = fetchSetting(slug, title, version);
+  const settingName = setting.name;
   const zipName = `${title.replace(/\s+/g, '-')}-v${version}.zip`;
-  const zipPath = writeZip(zipName, [{ name: settingName, data: readFileSync(join('public/downloads', slug, settingName)) }]);
+  const zipPath = writeZip(zipName, [setting]);
 
   const entry = changelog.find((c) => String(c.version) === String(version));
   const notes = `${entry?.notes ?? `${title} ${version}.`}\n\nUnzip it to get \`${settingName}\`, then follow the install steps on ${SITE}/plugins/${slug}/`;
@@ -76,10 +81,7 @@ function releaseBundle() {
   const version = (previous?.version ?? 0) + 1;
   const tag = `${BUNDLE.slug}-v${version}`;
   const zipName = `${BUNDLE.title.replace(/\s+/g, '-')}-v${version}.zip`;
-  const files = plugins.map((p) => {
-    const name = settingOf(p.id);
-    return { name, data: readFileSync(join('public/downloads', p.id, name)) };
-  });
+  const files = plugins.map((p) => fetchSetting(p.id, p.title, p.version));
   const zipPath = writeZip(zipName, files);
 
   const studio = plugins.filter((p) => p.compatibility?.edition === 'studio').map((p) => p.title);
@@ -123,14 +125,24 @@ function frontmatter(page) {
   return parse(page.split(/^---\s*$/m)[1]);
 }
 
-function settingOf(slug) {
-  const dir = join('public/downloads', slug);
-  const settings = readdirSync(dir).filter((f) => f.endsWith('.setting'));
-  if (settings.length !== 1) {
-    console.error(`Expected exactly one .setting in ${dir}, found ${settings.length}.`);
+/** The built .setting of <slug>-v<version> from its private LairTools release, under its real name. */
+function fetchSetting(slug, title, version) {
+  const tag = `${slug}-v${version}`;
+  const dir = mkdtempSync(join(tmpdir(), 'tel-source-'));
+  try {
+    execFileSync('gh', ['release', 'download', tag, '-R', SOURCE, '-p', '*.setting', '-D', dir], { stdio: 'pipe' });
+  } catch (error) {
+    console.error(`Could not download ${tag} from ${SOURCE}: ${String(error.stderr || error.message).trim()}`);
+    console.error(`Release it there first (.\\tools\\lair.ps1 release ${slug}, then git push origin ${tag}) and wait for CI.`);
     process.exit(1);
   }
-  return settings[0];
+  const settings = readdirSync(dir).filter((f) => f.endsWith('.setting'));
+  if (settings.length !== 1) {
+    console.error(`Expected exactly one .setting in the ${SOURCE} release ${tag}, found ${settings.length}.`);
+    process.exit(1);
+  }
+  // GitHub turns the spaces of an asset name into dots; the zip keeps the name Resolve shows
+  return { name: `${title}.setting`, data: readFileSync(join(dir, settings[0])) };
 }
 
 function writeZip(zipName, files) {

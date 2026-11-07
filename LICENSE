@@ -1,6 +1,6 @@
 The source code of this website is licensed under the MIT License below.
 
-It does not cover the plugins (public/downloads), the images and preview
+It does not cover the plugins (published as release downloads), the images and preview
 videos (src/content, src/assets, public/media), or the written content of
 the plugin pages and notes. Those are not open source; see "License" in
 README.md for how the plugins may be used.
